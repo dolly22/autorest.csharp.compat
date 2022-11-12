@@ -210,7 +210,7 @@ namespace AutoRest.CSharp.Input
     {
         public int[] IntStatusCodes => StatusCodes.Select(ToStatusCode).ToArray();
 
-        private static int ToStatusCode(StatusCodes arg) => int.Parse(arg.ToString().Trim('_'));
+        private static int ToStatusCode(StatusCodes arg) => arg == Input.StatusCodes.Default ? 0 : int.Parse(arg.ToString().Trim('_'));
     }
 
     internal partial class Value

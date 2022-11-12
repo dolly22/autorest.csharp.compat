@@ -6,6 +6,7 @@ using AutoRest.TestServer.Tests.Infrastructure;
 using Azure;
 using NUnit.Framework;
 using xms_error_responses;
+using xms_error_responses.Models;
 
 namespace AutoRest.TestServer.Tests
 {
@@ -15,10 +16,19 @@ namespace AutoRest.TestServer.Tests
         public Task AnimalNotFoundError() => Test((host, pipeline) =>
         {
             var value = "coyoteUgly";
-            var content = "{\"someBaseProp\":\"problem finding animal\",\"reason\":\"the type of animal requested is not available\",\"name\":\"coyote\",\"whatNotFound\":\"AnimalNotFound\"}";
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
+            var exception = Assert.ThrowsAsync<RequestFailedException<NotFoundErrorBase>>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
             Assert.AreEqual(404, exception.Status);
-            Assert.IsTrue(exception.Message.Contains(content));
+
+            Assert.NotNull(exception.Model);
+            Assert.IsAssignableFrom<AnimalNotFound>(exception.Model, "Must be assignable from AnimalNotFound");
+
+            if (exception.Model is AnimalNotFound notFound)
+            {
+                Assert.AreEqual("problem finding animal", notFound.SomeBaseProp);
+                Assert.AreEqual("the type of animal requested is not available", notFound.Reason);
+                Assert.AreEqual("coyote", notFound.Name);
+                Assert.AreEqual("AnimalNotFound", notFound.WhatNotFound);
+            }
         });
 
         [Test]
@@ -40,59 +50,99 @@ namespace AutoRest.TestServer.Tests
         public Task ExpectedPetHungryError() => Test((host, pipeline) =>
         {
             var value = "fetch";
-            var content = "{\"actionResponse\":\"howl\",\"errorType\":\"PetHungryOrThirstyError\",\"errorMessage\":\"scooby is low\",\"reason\":\"need more everything\",\"hungryOrThirsty\":\"hungry and thirsty\"}";
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () => await new PetClient(ClientDiagnostics, pipeline, host).DoSomethingAsync(value));
+            var exception = Assert.ThrowsAsync<RequestFailedException<PetActionError>>(async () => await new PetClient(ClientDiagnostics, pipeline, host).DoSomethingAsync(value));
             Assert.AreEqual(404, exception.Status);
-            Assert.IsTrue(exception.Message.Contains(content));
+
+            Assert.NotNull(exception.Model);
+            Assert.IsAssignableFrom<PetHungryOrThirstyError>(exception.Model, "Must be assignable from PetHungryOrThirstyError");
+
+            if (exception.Model is PetHungryOrThirstyError hungryOrThirstyError)
+            {
+                Assert.AreEqual("howl", hungryOrThirstyError.ActionResponse);
+                Assert.AreEqual("PetHungryOrThirstyError", hungryOrThirstyError.ErrorType);
+                Assert.AreEqual("scooby is low", hungryOrThirstyError.ErrorMessage);
+                Assert.AreEqual("need more everything", hungryOrThirstyError.Reason);
+                Assert.AreEqual("hungry and thirsty", hungryOrThirstyError.HungryOrThirsty);
+            }
         });
 
         [Test]
         public Task ExpectedPetSadError() => Test((host, pipeline) =>
         {
             var value = "jump";
-            var content = "{\"actionResponse\":\"grrrr\",\"errorType\":\"PetSadError\",\"errorMessage\":\"casper aint happy\",\"reason\":\"need more treats\"}";
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () => await new PetClient(ClientDiagnostics, pipeline, host).DoSomethingAsync(value));
+            var exception = Assert.ThrowsAsync<RequestFailedException<PetActionError>>(async () => await new PetClient(ClientDiagnostics, pipeline, host).DoSomethingAsync(value));
             Assert.AreEqual(500, exception.Status);
-            Assert.IsTrue(exception.Message.Contains(content));
+
+            Assert.NotNull(exception.Model);
+            Assert.IsAssignableFrom<PetSadError>(exception.Model, "Must be assignable from PetSadError");
+
+            if (exception.Model is PetSadError petSadError)
+            {
+                Assert.AreEqual("grrrr", petSadError.ActionResponse);
+                Assert.AreEqual("PetSadError", petSadError.ErrorType);
+                Assert.AreEqual("casper aint happy", petSadError.ErrorMessage);
+                Assert.AreEqual("need more treats", petSadError.Reason);
+            }
         });
 
         [Test]
         public Task IntError() => Test((host, pipeline) =>
         {
             var value = "alien123";
-            var content = "123";
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
+            var exception = Assert.ThrowsAsync<RequestFailedException<int>>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
             Assert.AreEqual(501, exception.Status);
-            Assert.IsTrue(exception.Message.Contains(content));
+
+            Assert.AreEqual(typeof(int), exception.Model.GetType());
+            Assert.AreEqual(123, exception.Model);
         });
 
         [Test]
         public Task LinkNotFoundError() => Test((host, pipeline) =>
         {
             var value = "weirdAlYankovic";
-            var content = "{\"someBaseProp\":\"problem finding pet\",\"reason\":\"link to pet not found\",\"whatSubAddress\":\"pet/yourpet was not found\",\"whatNotFound\":\"InvalidResourceLink\"}";
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
+            var exception = Assert.ThrowsAsync<RequestFailedException<NotFoundErrorBase>>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
             Assert.AreEqual(404, exception.Status);
-            Assert.IsTrue(exception.Message.Contains(content));
+
+            Assert.NotNull(exception.Model);
+            Assert.IsAssignableFrom<LinkNotFound>(exception.Model, "Must be assignable from LinkNotFound");
+
+            if (exception.Model is LinkNotFound linkNotFound)
+            {
+                Assert.AreEqual("problem finding pet", linkNotFound.SomeBaseProp);
+                Assert.AreEqual("link to pet not found", linkNotFound.Reason);
+                Assert.AreEqual("pet/yourpet was not found", linkNotFound.WhatSubAddress);
+                Assert.AreEqual("InvalidResourceLink", linkNotFound.WhatNotFound);
+            }
         });
 
         [Test]
         public Task StringError() => Test((host, pipeline) =>
         {
             var value = "ringo";
-            var content = $"\"{value} is missing\"";
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
+            var content = $"{value} is missing";
+            var exception = Assert.ThrowsAsync<RequestFailedException<string>>(async () => await new PetClient(ClientDiagnostics, pipeline, host).GetPetByIdAsync(value));
             Assert.AreEqual(400, exception.Status);
-            Assert.IsTrue(exception.Message.Contains(content));
+
+            Assert.AreEqual(typeof(string), exception.Model.GetType());
+            Assert.AreEqual(content, exception.Model);
         });
 
         [Test]
         public Task SendErrorWithParamNameModels() => Test((host, pipeline) =>
         {
-            var content = "{\"actionResponse\":\"grrrr\",\"errorType\":\"PetSadError\",\"errorMessage\":\"casper aint happy\",\"reason\":\"need more treats\"}";
-            var exception = Assert.ThrowsAsync<RequestFailedException>(async () => await new PetClient(ClientDiagnostics, pipeline, host).HasModelsParamAsync());
+            var exception = Assert.ThrowsAsync<RequestFailedException<PetActionError>>(async () => await new PetClient(ClientDiagnostics, pipeline, host).HasModelsParamAsync());
             Assert.AreEqual(500, exception.Status);
-            StringAssert.Contains(content, exception.Message);
+
+            Assert.NotNull(exception.Model);
+            Assert.IsAssignableFrom<PetSadError>(exception.Model, "Must be assignable from PetSadError");
+
+            if (exception.Model is PetSadError petSadError)
+            {
+                Assert.AreEqual("grrrr", petSadError.ActionResponse);
+                Assert.AreEqual("PetSadError", petSadError.ErrorType);
+                Assert.AreEqual("casper aint happy", petSadError.ErrorMessage);
+                Assert.AreEqual("need more treats", petSadError.Reason);
+            }
         });
     }
 }

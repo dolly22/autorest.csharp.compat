@@ -66,6 +66,27 @@ namespace xms_error_responses
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
             switch (message.Response.Status)
             {
+                case 400:
+                    {
+                        string value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = document.RootElement.GetString();
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
+                case 404:
+                    {
+                        NotFoundErrorBase value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = NotFoundErrorBase.DeserializeNotFoundErrorBase(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
+                case 501:
+                    {
+                        int value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = document.RootElement.GetInt32();
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
                 case 200:
                     {
                         Pet value = default;
@@ -95,6 +116,27 @@ namespace xms_error_responses
             _pipeline.Send(message, cancellationToken);
             switch (message.Response.Status)
             {
+                case 400:
+                    {
+                        string value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = document.RootElement.GetString();
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
+                case 404:
+                    {
+                        NotFoundErrorBase value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = NotFoundErrorBase.DeserializeNotFoundErrorBase(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
+                case 501:
+                    {
+                        int value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = document.RootElement.GetInt32();
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
                 case 200:
                     {
                         Pet value = default;
@@ -138,6 +180,13 @@ namespace xms_error_responses
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
             switch (message.Response.Status)
             {
+                case 500:
+                    {
+                        PetActionError value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
                 case 200:
                     {
                         PetAction value = default;
@@ -146,7 +195,12 @@ namespace xms_error_responses
                         return Response.FromValue(value, message.Response);
                     }
                 default:
-                    throw await ClientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+                    {
+                        PetActionError value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
             }
         }
 
@@ -165,6 +219,13 @@ namespace xms_error_responses
             _pipeline.Send(message, cancellationToken);
             switch (message.Response.Status)
             {
+                case 500:
+                    {
+                        PetActionError value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
                 case 200:
                     {
                         PetAction value = default;
@@ -173,7 +234,12 @@ namespace xms_error_responses
                         return Response.FromValue(value, message.Response);
                     }
                 default:
-                    throw ClientDiagnostics.CreateRequestFailedException(message.Response);
+                    {
+                        PetActionError value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
             }
         }
 
@@ -203,10 +269,22 @@ namespace xms_error_responses
             await _pipeline.SendAsync(message, cancellationToken).ConfigureAwait(false);
             switch (message.Response.Status)
             {
+                case 500:
+                    {
+                        PetActionError value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
                 case 200:
                     return message.Response;
                 default:
-                    throw await ClientDiagnostics.CreateRequestFailedExceptionAsync(message.Response).ConfigureAwait(false);
+                    {
+                        PetActionError value = default;
+                        using var document = await JsonDocument.ParseAsync(message.Response.ContentStream, default, cancellationToken).ConfigureAwait(false);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
             }
         }
 
@@ -219,10 +297,22 @@ namespace xms_error_responses
             _pipeline.Send(message, cancellationToken);
             switch (message.Response.Status)
             {
+                case 500:
+                    {
+                        PetActionError value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
                 case 200:
                     return message.Response;
                 default:
-                    throw ClientDiagnostics.CreateRequestFailedException(message.Response);
+                    {
+                        PetActionError value = default;
+                        using var document = JsonDocument.Parse(message.Response.ContentStream);
+                        value = PetActionError.DeserializePetActionError(document.RootElement);
+                        throw ErrorResponseExceptionFactory.Create(value, message.Response);
+                    }
             }
         }
     }

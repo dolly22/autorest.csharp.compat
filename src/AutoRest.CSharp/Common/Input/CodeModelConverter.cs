@@ -90,7 +90,7 @@ namespace AutoRest.CSharp.Common.Input
                 Description: operation.Language.Default.Description,
                 Accessibility: operation.Accessibility,
                 Parameters: CreateOperationParameters(operation.Parameters.Concat(serviceRequest.Parameters).ToList()),
-                Responses: operation.Responses.Select(CreateOperationResponse).ToList(),
+                Responses: BuildOperationResponses(operation),
                 HttpMethod: httpRequest.Method.ToCoreRequestMethod(),
                 RequestBodyMediaType: GetBodyFormat((httpRequest as HttpWithBodyRequest)?.KnownMediaType),
                 Uri: httpRequest.Uri,
@@ -137,12 +137,29 @@ namespace AutoRest.CSharp.Common.Input
             VirtualParameter: input is VirtualParameter {Schema: not ConstantSchema} vp ? vp : null
         );
 
-        public OperationResponse CreateOperationResponse(ServiceResponse response) => new(
+
+        public List<OperationResponse> BuildOperationResponses(Operation operation)
+        {
+            var allResponses = new List<OperationResponse>();
+            allResponses.AddRange(operation.Responses.Select(r => CreateOperationResponse(r)));
+
+            if (Configuration.CompatErrorResponses)
+            {
+                // Add all exceptions to Responses (marked as IsErrorResponse)
+                allResponses.AddRange(operation.Exceptions
+                    .OfType<SchemaResponse>()
+                    .Select(r => CreateOperationResponse(r, true)));
+            }
+
+            return allResponses;
+        }
+
+        public OperationResponse CreateOperationResponse(ServiceResponse response, bool isError = false) => new(
             StatusCodes: response.HttpResponse.IntStatusCodes.ToList(),
             BodyType: GetResponseBodyType(response),
             BodyMediaType: GetBodyFormat(response.HttpResponse.KnownMediaType),
             Headers: GetResponseHeaders(response.HttpResponse.Headers),
-            IsErrorResponse: false
+            IsErrorResponse: isError
         );
 
         private OperationResponseHeader CreateResponseHeader(HttpResponseHeader header) => new(

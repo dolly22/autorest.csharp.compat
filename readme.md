@@ -17,10 +17,33 @@ All compatibility options are prefixed with `compat-`
 
 ### Generate client interfaces
 
-Autorest no longer generates interfaces for convenience client. You can enable this behavior by using this configuration value.
+Autorest no longer generates interfaces for convenience clients. You can enable this behavior by using `compat-client-interfaces` configuration option.
 
 ```
 compat-client-interfaces: true
+```
+
+### Handle custom error responses
+
+Autorest v2 supported throwing exception with custom error model from default response. Autorest v3 always throws `RequestFailedException` with custom error content serialized as string.
+
+When `compat-error-responses` option is enabled, generator handles custom error responses (marked with `x-ms-error-response`) and also supports custom default error response model. This is modeled by throwing custom exceptions created by user defined factory method.
+
+This has to be static `Create` method on `ErrorResponseExceptionFactory` static class of type `Func<T, Response, Exception>`.
+
+```csharp
+static class ErrorResponseExceptionFactory
+{
+    internal static RequestFailedException<T> Create<T>(T value, Response response) => new(value, response);
+}
+```
+
+See example [generated client](https://github.com/dolly22/autorest.csharp.compat/tree/feature/v3-compat/test/TestServerProjects/xms-error-responses) for this [swagger.json](https://github.com/Azure/autorest.testserver/blob/main/swagger/xms-error-responses.json) for more details.
+
+Enable to this extension in your configuration with
+
+```
+compat-error-responses: true
 ```
 
 

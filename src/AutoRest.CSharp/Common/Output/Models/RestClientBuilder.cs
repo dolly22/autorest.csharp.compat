@@ -151,7 +151,7 @@ namespace AutoRest.CSharp.Output.Models
             }
 
             List<Response> clientResponse = new List<Response>();
-            foreach (var response in operation.Responses.Where(r => !r.IsErrorResponse))
+            foreach (var response in operation.Responses)
             {
                 List<StatusCodes> statusCodes = new List<StatusCodes>();
                 foreach (var statusCode in response.StatusCodes)
@@ -160,7 +160,7 @@ namespace AutoRest.CSharp.Output.Models
                 }
 
                 var responseBody = operation.LongRunning != null ? null : BuildResponseBody(response, typeFactory);
-                clientResponse.Add(new Response(responseBody, statusCodes.ToArray()));
+                clientResponse.Add(new Response(responseBody, statusCodes.ToArray(), response.IsErrorResponse));
             }
 
             responseType = ReduceResponses(clientResponse);
@@ -429,19 +429,25 @@ namespace AutoRest.CSharp.Output.Models
         // Merges operations without response types types together
         private static CSharpType? ReduceResponses(List<Response> responses)
         {
-            foreach (var typeGroup in responses.GroupBy(r => r.ResponseBody))
+            var nonErrorResponses = responses.Where(r => !r.IsErrorResponse).ToList();
+            responses.RemoveAll(r => !r.IsErrorResponse);
+
+            foreach (var typeGroup in nonErrorResponses.GroupBy(r => r.ResponseBody))
             {
                 foreach (var individualResponse in typeGroup)
                 {
-                    responses.Remove(individualResponse);
+                    nonErrorResponses.Remove(individualResponse);
                 }
 
-                responses.Add(new Response(
+                nonErrorResponses.Add(new Response(
                     typeGroup.Key,
                     typeGroup.SelectMany(r => r.StatusCodes).Distinct().ToArray()));
             }
 
-            var bodyTypes = responses.Select(r => r.ResponseBody?.Type)
+            // add nonErrorResponses merged responses back
+            responses.AddRange(nonErrorResponses);
+
+            var bodyTypes = nonErrorResponses.Select(r => r.ResponseBody?.Type)
                 .OfType<CSharpType>()
                 .Distinct()
                 .ToArray();
