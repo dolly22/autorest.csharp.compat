@@ -17,10 +17,18 @@ All compatibility options are prefixed with `compat-`
 
 ### Generate client interfaces
 
-Autorest no longer generates interfaces for convenience clients. You can enable this behavior by using `compat-client-interfaces` configuration option.
+Autorest `V3` no longer generates interfaces for convenience clients. You can enable this behavior by using `compat-client-interfaces` configuration option.
 
 ```
 compat-client-interfaces: true
+```
+
+### Anonymous client public constructor
+
+Enable this option to generate public constructor to create non authenticated Rest client instance. It's helpful when your api contains mix of authenticated and anonymous endpoints and you need option to create client with authentication or anonymous.
+
+```
+compat-anonymous-client-ctor: true
 ```
 
 ### Handle custom error responses

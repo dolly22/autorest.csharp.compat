@@ -38,6 +38,7 @@ namespace AutoRest.CSharp.Input
             // options added for compatibility with v2 generators
             public const string CompatClientInterfaces = "compat-client-interfaces";
             public const string CompatErrorResponses = "compat-error-responses";
+            public const string CompatAnonymousClientCtor = "compat-anonymous-client-ctor";
         }
 
         public static void Initialize(
@@ -60,6 +61,7 @@ namespace AutoRest.CSharp.Input
             IReadOnlyList<string> suppressAbstractBaseClasses,
             bool compatClientInterfaces,
             bool compatErrorResponses,
+            bool compatAnonymousClientCtor,
             MgmtConfiguration mgmtConfiguration)
         {
             _outputFolder = outputFolder;
@@ -78,6 +80,7 @@ namespace AutoRest.CSharp.Input
             // compat options
             CompatClientInterfaces = compatClientInterfaces;
             CompatErrorResponses = compatErrorResponses;
+            CompatAnonymousClientCtor = compatAnonymousClientCtor;
 
             projectFolder ??= ProjectFolderDefault;
             if (Path.IsPathRooted(projectFolder))
@@ -116,6 +119,7 @@ namespace AutoRest.CSharp.Input
         public static bool DisablePaginationTopRenaming { get; private set; }
         public static bool CompatClientInterfaces { get; private set; }
         public static bool CompatErrorResponses { get; private set; }
+        public static bool CompatAnonymousClientCtor { get; private set; }
 
         private static IReadOnlyList<string>? _suppressAbstractBaseClasses;
         public static IReadOnlyList<string> SuppressAbstractBaseClasses => _suppressAbstractBaseClasses ?? throw new InvalidOperationException("Configuration has not been initialized");
@@ -153,6 +157,7 @@ namespace AutoRest.CSharp.Input
                 suppressAbstractBaseClasses: autoRest.GetValue<string[]?>(Options.SuppressAbstractBaseClasses).GetAwaiter().GetResult() ?? Array.Empty<string>(),
                 compatClientInterfaces: GetOptionValue(autoRest, Options.CompatClientInterfaces),
                 compatErrorResponses: GetOptionValue(autoRest, Options.CompatErrorResponses),
+                compatAnonymousClientCtor: GetOptionValue(autoRest, Options.CompatAnonymousClientCtor),
                 mgmtConfiguration: MgmtConfiguration.GetConfiguration(autoRest)
             );
         }
@@ -189,6 +194,8 @@ namespace AutoRest.CSharp.Input
                 case Options.CompatClientInterfaces:
                     return false;
                 case Options.CompatErrorResponses:
+                    return false;
+                case Options.CompatAnonymousClientCtor:
                     return false;
                 default:
                     return null;

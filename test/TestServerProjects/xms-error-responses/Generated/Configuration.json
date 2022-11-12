@@ -10,5 +10,6 @@
   "skip-csproj-packagereference": true,
   "generation1-convenience-client": true,
   "compat-client-interfaces": true,
-  "compat-error-responses": true
+  "compat-error-responses": true,
+  "compat-anonymous-client-ctor": true
 }

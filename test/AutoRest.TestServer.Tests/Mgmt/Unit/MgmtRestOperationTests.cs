@@ -70,6 +70,7 @@ namespace AutoRest.TestServer.Tests.Mgmt.Unit
                 suppressAbstractBaseClasses: Array.Empty<string>(),
                 compatClientInterfaces: false,
                 compatErrorResponses: false,
+                compatAnonymousClientCtor: false,
                 mgmtConfiguration: mgmtConfiguration);
         }
 

@@ -213,6 +213,7 @@ namespace AutoRest.CSharp.AutoRest.Communication
                 suppressAbstractBaseClasses,
                 ReadOption(root, Configuration.Options.CompatClientInterfaces),
                 ReadOption(root, Configuration.Options.CompatErrorResponses),
+                ReadOption(root, Configuration.Options.CompatAnonymousClientCtor),
                 MgmtConfiguration.LoadConfiguration(root)
             );
         }

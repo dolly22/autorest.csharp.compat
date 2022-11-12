@@ -27,6 +27,19 @@ namespace xms_error_responses
         }
 
         /// <summary> Initializes a new instance of PetClient. </summary>
+        /// <param name="endpoint"> server parameter. </param>
+        /// <param name="options"> The options for configuring the client. </param>
+        public PetClient(Uri endpoint = null, XMSErrorResponseExtensionsClientOptions options = null)
+        {
+            endpoint ??= new Uri("http://localhost:3000");
+
+            options ??= new XMSErrorResponseExtensionsClientOptions();
+            _clientDiagnostics = new ClientDiagnostics(options);
+            _pipeline = HttpPipelineBuilder.Build(options);
+            RestClient = new PetRestClient(_clientDiagnostics, _pipeline, endpoint);
+        }
+
+        /// <summary> Initializes a new instance of PetClient. </summary>
         /// <param name="clientDiagnostics"> The handler for diagnostic messaging in the client. </param>
         /// <param name="pipeline"> The HTTP pipeline for sending and receiving REST requests and responses. </param>
         /// <param name="endpoint"> server parameter. </param>
