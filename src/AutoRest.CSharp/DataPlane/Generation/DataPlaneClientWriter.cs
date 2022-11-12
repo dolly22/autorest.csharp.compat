@@ -33,7 +33,10 @@ namespace AutoRest.CSharp.Generation.Writers
             using (writer.Namespace(@namespace))
             {
                 writer.WriteXmlDocumentationSummary($"{client.Description}");
-                using (writer.Scope($"{client.Declaration.Accessibility} partial class {cs.Name}"))
+
+                var implementedInterface = Configuration.CompatClientInterfaces ? $" : I{cs.Name}" : string.Empty;
+
+                using (writer.Scope($"{client.Declaration.Accessibility} partial class {cs.Name}{implementedInterface}"))
                 {
                     WriteClientFields(writer, client.RestClient, true);
                     WriteClientCtors(writer, client, library);

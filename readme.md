@@ -7,6 +7,22 @@ ___
    - If you still want to generate code based on `V2` version, you can add `--legacy` flag to the command line to get the previous behavior.
 ___
 
+# Enhanced V2 generator compatibility
+
+Autorest csharp `V3` generated code is pretty difficult to use for generic (non Azure sdk) API REST clients. This fork tries to address major issues and makes code generated with `generation1-convenience-client` more compatible with `V2` generated code.
+
+## Compatibility options
+
+All compatibility options are prefixed with `compat-`
+
+### Generate client interfaces
+
+Autorest no longer generates interfaces for convenience client. You can enable this behavior by using this configuration value.
+
+```
+compat-client-interfaces: true
+```
+
 
 # C# code generator for AutoRest V3
 
@@ -42,7 +58,7 @@ ___
 
 ## Prerequisites
 
-- [NodeJS (14.x.x)](https://nodejs.org/en/) 
+- [NodeJS (14.x.x)](https://nodejs.org/en/)
 - [.NET Core SDK (5.0.100)](https://dotnet.microsoft.com/download/dotnet-core/5.0)
 - [PowerShell Core 7](https://github.com/PowerShell/PowerShell/releases/latest)
 - `npm install` (at root)
@@ -65,11 +81,11 @@ These arguments change the behavior:
 
 ### Testing Details
 
-[autorest.testserver](http://github.com/Azure/autorest.testserver/) provides a platform for automated testing of the code generators. 
+[autorest.testserver](http://github.com/Azure/autorest.testserver/) provides a platform for automated testing of the code generators.
 
-It packages a bunch of test swagger files, along with a “mock” nodejs server. 
+It packages a bunch of test swagger files, along with a “mock” nodejs server.
 
-The swagger files are compiled, and then run, which pings the mock server (to verify behavior). This tests both the Modeler 4 and language specific codegen. 
+The swagger files are compiled, and then run, which pings the mock server (to verify behavior). This tests both the Modeler 4 and language specific codegen.
 
 This document contains some additional [technical details](https://github.com/Azure/autorest.csharp/blob/feature/v3/test/README.md).
 
@@ -126,11 +142,11 @@ Refer also to [azure-sdk-for-net/CONTRIBUTING.md](https://github.com/Azure/azure
 
 Merging a change in autorest.csharp will open a PR against azure-sdk-for-net with every project’s generated code staged for review.
 
-Along with this, it also bumps the generator to the new version. 
+Along with this, it also bumps the generator to the new version.
 
 This bump is done [here](https://github.com/Azure/azure-sdk-for-net/blob/master/eng/Packages.Data.props).
 
-The generator is shipped as a NuGet package. 
+The generator is shipped as a NuGet package.
 
 This way, every binding stays in lockstep with the current generator
 
@@ -143,13 +159,13 @@ Use below command to generate code:
  autorest --use:@autorest/csharp@3.0.0-beta.20210210.4 --input-file:FILENAME  --clear-output-folder:true --output-folder:DIRECTORY
  ```
 
-Note: 
+Note:
 1. Use @autorest/csharp version v3.0.0-beta.20210210.4 or later.
 2. If you don't want to override the `.csproj` after the first generation, you can pass `--skip-csproj` flag with the autorest command.
 
 For more details please refer [these](https://github.com/Azure/autorest/tree/master/docs/generate) docs to generate code from your OpenAPI definition using AutoRest.
 
-## Debugging 
+## Debugging
 
 There are two entry points for debugging autorest.csharp:
 
@@ -314,7 +330,7 @@ namespace Azure.Service.Models
 {
     public partial class Model
     {
-        internal string Property { get; } 
+        internal string Property { get; }
     }
 }
 ```
@@ -361,7 +377,7 @@ namespace Azure.Service.Models
     public partial class Model
     {
         [CodeGenMember("Property")]
-        public string RenamedProperty { get; } 
+        public string RenamedProperty { get; }
     }
 }
 ```
@@ -391,7 +407,7 @@ Scenarios that would work:
 
 1. String <-> TimeSpan (both represented as string in JSON)
 2. Float <-> Int (both are numbers)
-3. String <-> Enums (both strings) 
+3. String <-> Enums (both strings)
 4. String -> Uri
 
 Won't work:
@@ -439,7 +455,7 @@ namespace Azure.Service.Models
     public partial class Model
     {
 -        public string Property { get; }
-+        // Serialization code now reads and writes DateTime value instead of string  
++        // Serialization code now reads and writes DateTime value instead of string
     }
 }
 ```
@@ -484,7 +500,7 @@ namespace Azure.Service.Models
     public partial class Model
     {
 -        public string Property { get; }
-+        // Serialization code now reads and writes JsonElement value instead of string  
++        // Serialization code now reads and writes JsonElement value instead of string
     }
 }
 ```
@@ -531,7 +547,7 @@ namespace Azure.Service.Models
     public partial class Model
     {
 -        /// Subpar doc comment
--        public string Property { get; }  
+-        public string Property { get; }
     }
 }
 ```
@@ -879,7 +895,7 @@ namespace Azure.Service.Models
     public partial class Model
     {
         public Model()
-        {  
+        {
             Property = "a";
         }
 
@@ -911,7 +927,7 @@ namespace Azure.Service.Models
     public partial class Model
     {
 -        public Model()
--        {  
+-        {
 -            Property = "a";
 -        }
     }
@@ -936,12 +952,12 @@ namespace Azure.Service.Models
     public partial class Model
     {
         public Model()
-        {  
+        {
             Property = "a";
         }
 
         public Model(string property)
-        {  
+        {
             Property = property;
         }
 
@@ -970,7 +986,7 @@ namespace Azure.Service.Models
     public partial class Model
     {
 -        public Model(string property)
--        {  
+-        {
 -            Property = property;
 -        }
     }
@@ -1052,7 +1068,7 @@ directive:
 internal virtual Response Operation(string body = null, CancellationToken cancellationToken = default)
 internal virtual async Task<Response> OperationAsync(string body = null, CancellationToken cancellationToken = default)
 ```
-    
+
 </details>
 
 ### Exclude models from namespace
@@ -1085,12 +1101,12 @@ input-file: "swagger-document"
 }
 ```
 </details>
-    
-    
-### Extending a model with additional constructors    
-    
+
+
+### Extending a model with additional constructors
+
 <details>
-    
+
 As with most customization, you can define a partial class for Models and extend them with methods and constructors.
 
 **Generated code before (Generated/Models/Model.cs):**

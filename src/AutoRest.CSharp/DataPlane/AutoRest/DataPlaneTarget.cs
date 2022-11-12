@@ -21,6 +21,7 @@ namespace AutoRest.CSharp.AutoRest.Plugins
             var library = context.Library;
             var modelWriter = new ModelWriter();
             var clientWriter = new DataPlaneClientWriter();
+            var clientInterfaceWriter = new DataPlaneClientInterfaceWriter();
             var restClientWriter = new RestClientWriter();
             var serializeWriter = new SerializationWriter();
             var headerModelModelWriter = new DataPlaneResponseHeaderGroupWriter();
@@ -75,6 +76,16 @@ namespace AutoRest.CSharp.AutoRest.Plugins
                 var codeWriter = new CodeWriter();
                 clientWriter.WriteClient(codeWriter, client, library);
                 project.AddGeneratedFile($"{client.Type.Name}.cs", codeWriter.ToString());
+            }
+
+            if (Configuration.CompatClientInterfaces)
+            {
+                foreach (var client in library.Clients)
+                {
+                    var codeWriter = new CodeWriter();
+                    clientInterfaceWriter.WriteClientInterface(codeWriter, client, library);
+                    project.AddGeneratedFile($"I{client.Type.Name}.cs", codeWriter.ToString());
+                }
             }
 
             foreach (var operation in library.LongRunningOperations)

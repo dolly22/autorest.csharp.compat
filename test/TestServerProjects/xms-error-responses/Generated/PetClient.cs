@@ -15,7 +15,7 @@ using xms_error_responses.Models;
 namespace xms_error_responses
 {
     /// <summary> The Pet service client. </summary>
-    public partial class PetClient
+    public partial class PetClient : IPetClient
     {
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly HttpPipeline _pipeline;

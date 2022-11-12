@@ -137,6 +137,7 @@ namespace AutoRest.CSharp.AutoRest.Communication
                     WriteIfNotDefault(writer, Configuration.Options.Generation1ConvenienceClient, Configuration.Generation1ConvenienceClient);
                     WriteIfNotDefault(writer, Configuration.Options.SingleTopLevelClient, Configuration.SingleTopLevelClient);
                     WriteIfNotDefault(writer, Configuration.Options.ProjectFolder, Configuration.RelativeProjectFolder);
+                    WriteIfNotDefault(writer, Configuration.Options.CompatClientInterfaces, Configuration.CompatClientInterfaces);
                     Utf8JsonWriterExtensions.WriteNonEmptyArray(writer, nameof(Configuration.ProtocolMethodList), Configuration.ProtocolMethodList);
                     Utf8JsonWriterExtensions.WriteNonEmptyArray(writer, nameof(Configuration.SuppressAbstractBaseClasses), Configuration.SuppressAbstractBaseClasses);
 
@@ -210,6 +211,7 @@ namespace AutoRest.CSharp.AutoRest.Communication
                 projectPath ?? ReadStringOption(root, Configuration.Options.ProjectFolder),
                 protocolMethods,
                 suppressAbstractBaseClasses,
+                ReadOption(root, Configuration.Options.CompatClientInterfaces),
                 MgmtConfiguration.LoadConfiguration(root)
             );
         }

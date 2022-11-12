@@ -34,6 +34,9 @@ namespace AutoRest.CSharp.Input
             public const string SkipSerializationFormatXml = "skip-serialization-format-xml";
             public const string DisablePaginationTopRenaming = "disable-pagination-top-renaming";
             public const string SuppressAbstractBaseClasses = "suppress-abstract-base-class";
+
+            // options added for compatibility with v2 generators
+            public const string CompatClientInterfaces = "compat-client-interfaces";
         }
 
         public static void Initialize(
@@ -54,6 +57,7 @@ namespace AutoRest.CSharp.Input
             string? projectFolder,
             string[] protocolMethodList,
             IReadOnlyList<string> suppressAbstractBaseClasses,
+            bool compatClientInterfaces,
             MgmtConfiguration mgmtConfiguration)
         {
             _outputFolder = outputFolder;
@@ -68,6 +72,10 @@ namespace AutoRest.CSharp.Input
             SkipCSProjPackageReference = skipCSProjPackageReference;
             Generation1ConvenienceClient = generation1ConvenienceClient;
             SingleTopLevelClient = singleTopLevelClient;
+
+            // compat options
+            CompatClientInterfaces = compatClientInterfaces;
+
             projectFolder ??= ProjectFolderDefault;
             if (Path.IsPathRooted(projectFolder))
             {
@@ -103,6 +111,7 @@ namespace AutoRest.CSharp.Input
         public static bool SingleTopLevelClient { get; private set; }
         public static bool SkipSerializationFormatXml { get; private set; }
         public static bool DisablePaginationTopRenaming { get; private set; }
+        public static bool CompatClientInterfaces { get; private set; }
         private static IReadOnlyList<string>? _suppressAbstractBaseClasses;
         public static IReadOnlyList<string> SuppressAbstractBaseClasses => _suppressAbstractBaseClasses ?? throw new InvalidOperationException("Configuration has not been initialized");
 
@@ -137,6 +146,7 @@ namespace AutoRest.CSharp.Input
                 projectFolder: autoRest.GetValue<string?>(Options.ProjectFolder).GetAwaiter().GetResult(),
                 protocolMethodList: autoRest.GetValue<string[]?>(Options.ProtocolMethodList).GetAwaiter().GetResult() ?? Array.Empty<string>(),
                 suppressAbstractBaseClasses: autoRest.GetValue<string[]?>(Options.SuppressAbstractBaseClasses).GetAwaiter().GetResult() ?? Array.Empty<string>(),
+                compatClientInterfaces: GetOptionValue(autoRest, Options.CompatClientInterfaces),
                 mgmtConfiguration: MgmtConfiguration.GetConfiguration(autoRest)
             );
         }
@@ -169,6 +179,8 @@ namespace AutoRest.CSharp.Input
                 case Options.SkipSerializationFormatXml:
                     return false;
                 case Options.DisablePaginationTopRenaming:
+                    return false;
+                case Options.CompatClientInterfaces:
                     return false;
                 default:
                     return null;
