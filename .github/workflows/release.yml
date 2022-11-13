@@ -1,6 +1,6 @@
 # Create github release from pushed tag, publish package to npm
 
-name: Release package
+name: Release from tag
 on:
   workflow_dispatch:
 
@@ -21,7 +21,7 @@ jobs:
     - name: Get version from tag
       id: parse-tag
       run: |
-        $gitRef=${{ github.ref }}
+        $gitRef="${{ github.ref }}"
         if (-not $gitRef.StartsWith("/refs/heads/tags")) {
           throw "Must be started from version tag ref!"
         }
