@@ -1,3 +1,4 @@
+name: Github release
 on:
   workflow_dispatch:
     inputs:
@@ -7,20 +8,68 @@ on:
 
 jobs:
   build:
-    name: Build release
-    runs-on: windows-latest  
-    
+    name: Build packages
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version_npm.outputs.version }}
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - uses: actions/setup-dotnet@v3
       with:
         global-json-file: global.json
-    - run: dotnet build -c Release -p:OfficialBuildId=${{ inputs.prerelease_version }}
-    
-    - name: Archive build binaries
+
+    - name: Build dotnet
+      run: dotnet build -c Release -p:OfficialBuildId=${{ inputs.prerelease_version }} src/AutoRest.CSharp/AutoRest.CSharp.csproj
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+        DOTNET_MULTILEVEL_LOOKUP: 0
+
+    - name: Update npm version
+      id: version_npm
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+      run: |
+        $currentVersion = node -p -e "require('./package.json').version";
+        $devVersion = "$currentVersion-beta.${{ inputs.prerelease_version }}"
+        npm version --no-git-tag-version $devVersion | Out-Null;
+        "version=$devVersion" >> $env:GITHUB_OUTPUT
+        "AutoRest C# v$devVersion" >> $env:GITHUB_STEP_SUMMARY
+      shell: pwsh
+
+    - name: Artifact build
       uses: actions/upload-artifact@v3
       with:
         name: autorest-csharp
         path: |
           artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+
+    - name: Pack npm
+      id: pack_npm
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+      run: npm pack -q
+
+    - name: Artifact npm
+      uses: actions/upload-artifact@v3
+      with:
+        name: autorest-csharp-npm
+        path: |
+          artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1/*.tgz
+
+  github-release:
+    name: Github release
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: Download npm package
+      uses: actions/download-artifact@v3
+      with:
+        name: autorest-csharp-npm
+
+    - name: Create release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          *.tgz
