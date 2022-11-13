@@ -1,0 +1,24 @@
+name: CI build
+on:
+  push:
+    branches:
+    - feature/v3-compat
+    - feature/*
+
+jobs:
+  build:
+    name: Build autorest
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - run: npm ci
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
+    - run: dotnet build

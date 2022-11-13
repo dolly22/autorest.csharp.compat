@@ -1,6 +1,7 @@
 {
   "version": "3.0.0",
-  "name": "@autorest/csharp",
+  "name": "autorest-csharp-compat",
+  "homepage": "https://github.com/dolly22/autorest.csharp.compat#readme",
   "description": "See readme.md for details",
   "main": "index.mjs",
   "scripts": {

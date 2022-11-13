@@ -1,0 +1,57 @@
+# Prepare changelog for new release and tag sources
+
+name: Prepare release tag
+run-name: Prepare release tag on ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease_version:
+        description: 'Prerelease tag (format yyyyMMDD.x)'
+        required: true
+
+jobs:
+  build:
+    name: Create version tag
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version_npm.outputs.version }}
+
+    steps:
+    # Use custom ssh key to allow pushed tag to trigger another workflow
+    - uses: actions/checkout@v3
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    # Theoretically it's not needed to build here, but there are some prerelease version format check we would like to use
+    - name: Build dotnet
+      run: dotnet build -p:OfficialBuildId=${{ inputs.prerelease_version }} src/AutoRest.CSharp/AutoRest.CSharp.csproj
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+        DOTNET_MULTILEVEL_LOOKUP: 0
+
+    - name: Determine version
+      id: version_npm
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Debug/netcoreapp3.1
+      run: |
+        $currentVersion = node -p -e "require('./package.json').version";
+        $devVersion = "v$currentVersion-beta.${{ inputs.prerelease_version }}"
+        "version=$devVersion" >> $env:GITHUB_OUTPUT
+        "AutoRest C# $devVersion" >> $env:GITHUB_STEP_SUMMARY
+      shell: pwsh
+
+    - name: Create tag
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.git.createRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: 'refs/tags/${{ steps.version_npm.outputs.version }}',
+            sha: context.sha
+          })

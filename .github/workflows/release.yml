@@ -1,0 +1,138 @@
+# Create github release from pushed tag, publish package to npm
+
+name: Release from tag
+run-name: Release from tag ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build packages
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version_npm.outputs.version }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
+
+    - name: Get version from tag
+      id: parse-tag
+      run: |
+        $gitRef="${{ github.ref }}"
+        if (-not $gitRef.StartsWith("refs/tags")) {
+          throw "Must be started from version tag ref!"
+        }
+        $officialBuildId="${{ github.ref_name }}".Split(".")[-2, -1] -Join "."
+        "officialBuildId=$officialBuildId" >> $env:GITHUB_OUTPUT
+      shell: pwsh
+
+    - name: Build dotnet
+      run: dotnet build -c Release -p:OfficialBuildId=${{ steps.parse-tag.outputs.officialBuildId }} src/AutoRest.CSharp/AutoRest.CSharp.csproj
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+    - name: Update npm version
+      id: version_npm
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+      run: |
+        $packageVersion="${{ github.ref_name }}".TrimStart("v")
+        npm version --no-git-tag-version $packageVersion
+      shell: pwsh
+
+    - name: Artifact build
+      uses: actions/upload-artifact@v3
+      with:
+        name: autorest-csharp
+        path: |
+          artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+
+    - name: Pack npm
+      id: pack_npm
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+      run: npm pack -q
+
+    - name: Artifact npm
+      uses: actions/upload-artifact@v3
+      with:
+        name: autorest-csharp-npm
+        path: |
+          artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1/*.tgz
+
+    - name: Extract release notes
+      uses: ffurrer2/extract-release-notes@v1
+      with:
+        release_notes_file: RELEASE_NOTES.md
+
+    - name: Artifact release notes
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-notes
+        path: |
+          RELEASE_NOTES.md
+
+  github-release:
+    name: Github release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Download npm package
+      uses: actions/download-artifact@v3
+      with:
+        name: autorest-csharp-npm
+
+    - name: Download release notes
+      uses: actions/download-artifact@v3
+      with:
+        name: release-notes
+
+    - name: Create release
+      uses: softprops/action-gh-release@v1
+      with:
+        body_path: RELEASE_NOTES.md
+        files: |
+          *.tgz
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+        registry-url: 'https://npm.pkg.github.com'
+
+    - name: Extract npm tgz
+      run: tar -xvf *.tgz
+
+    - name: Publish to github registry
+      working-directory: ./package
+      run: |
+        # Change package name to github format
+        echo "$( jq '.name = "@dolly22/autorest-csharp-compat"' package.json )" > package.json
+        npm publish --@dolly22:registry=https://npm.pkg.github.com
+      env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  npm-release:
+    name: NPM registry release
+    runs-on: ubuntu-latest
+    environment: npm-registry
+    needs: build
+
+    steps:
+    - name: Download npm package
+      uses: actions/download-artifact@v3
+      with:
+        name: autorest-csharp-npm
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - run: npm publish --access=public *.tgz
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
