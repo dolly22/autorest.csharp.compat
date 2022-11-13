@@ -1,0 +1,26 @@
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease_version:
+        description: 'Prerelease tag (format yyyyMMDD.x)'
+        required: true
+
+jobs:
+  build:
+    name: Build release
+    runs-on: windows-latest  
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
+    - run: dotnet build -c Release -p:OfficialBuildId=${{ inputs.prerelease_version }}
+    
+    - name: Archive build binaries
+      uses: actions/upload-artifact@v3
+      with:
+        name: autorest-csharp
+        path: |
+          artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
