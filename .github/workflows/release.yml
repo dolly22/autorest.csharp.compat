@@ -1,4 +1,6 @@
-name: Github create release
+# Create github release from pushed tag, publish package to npm
+
+name: Release package
 on:
   push:
     tags:
@@ -73,3 +75,23 @@ jobs:
       with:
         files: |
           *.tgz
+
+  npm-release:
+    name: NPM registry release
+    environment: npm-registry
+    needs: build
+
+    steps:
+    - name: Download npm package
+      uses: actions/download-artifact@v3
+      with:
+        name: autorest-csharp-npm
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+        registry-url: 'https://registry.npmjs.org'
+
+    - run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
