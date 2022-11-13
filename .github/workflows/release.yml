@@ -25,6 +25,7 @@ jobs:
       run: |
         $officialBuildId="${{ github.ref_name }}".Split(".")[-2, -1] -Join "."
         "officialBuildId=$officialBuildId" >> $env:GITHUB_OUTPUT
+      shell: pwsh
 
     - name: Build dotnet
       run: dotnet build -c Release -p:OfficialBuildId=${{ steps.parse-tag.outputs.officialBuildId }} src/AutoRest.CSharp/AutoRest.CSharp.csproj
@@ -62,7 +63,6 @@ jobs:
   github-release:
     name: Github release
     needs: build
-    runs-on: windows-latest
 
     steps:
     - name: Download npm package
@@ -90,7 +90,6 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: '16.x'
-        registry-url: 'https://registry.npmjs.org'
 
     - run: npm publish
       env:

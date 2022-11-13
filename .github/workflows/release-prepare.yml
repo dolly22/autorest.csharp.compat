@@ -11,16 +11,17 @@ on:
 jobs:
   build:
     name: Version sources
-    runs-on: windows-latest
     outputs:
       version: ${{ steps.version_npm.outputs.version }}
 
     steps:
     - uses: actions/checkout@v3
-
     - uses: actions/setup-dotnet@v3
       with:
         global-json-file: global.json
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
 
     # Theoretically it's not needed to build here, but there are some prerelease version format check we would like to use
     - name: Build dotnet
