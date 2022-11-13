@@ -18,7 +18,11 @@ jobs:
       version: ${{ steps.version_npm.outputs.version }}
 
     steps:
+    # Use custom ssh key to allow pushed tag to trigger another workflow
     - uses: actions/checkout@v3
+      with:
+        ssh-key: "${{ secrets.COMMIT_KEY }}"
+
     - uses: actions/setup-dotnet@v3
       with:
         global-json-file: global.json
