@@ -97,6 +97,13 @@ jobs:
       with:
         node-version: '16.x'
 
-    - run: npm publish
+    - name: Get package filename
+      id: npm-package
+      run: |
+        $package=Get-ChildItem "*.tgz" | Select-Object -First 1
+        "filename=$package" >> $env:GITHUB_OUTPUT
+      shell: pwsh
+
+    - run: npm publish {{ steps.npm-package.outputs.filename }}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
