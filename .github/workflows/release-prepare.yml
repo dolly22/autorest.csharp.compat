@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     name: Version sources
+    runs-on: windows-latest
     outputs:
       version: ${{ steps.version_npm.outputs.version }}
 
