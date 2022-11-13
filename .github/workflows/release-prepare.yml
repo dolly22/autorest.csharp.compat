@@ -1,7 +1,7 @@
 # Prepare changelog for new release and tag sources
 
-name: Prepare release
-run-name: Prepare release on ${{ github.ref_name }}
+name: Prepare release tag
+run-name: Prepare release from ref ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: Version sources
+    name: Create version tag
     runs-on: windows-latest
     outputs:
       version: ${{ steps.version_npm.outputs.version }}
@@ -20,9 +20,6 @@ jobs:
     steps:
     # Use custom ssh key to allow pushed tag to trigger another workflow
     - uses: actions/checkout@v3
-      with:
-        ssh-key: "${{ secrets.COMMIT_KEY }}"
-
     - uses: actions/setup-dotnet@v3
       with:
         global-json-file: global.json

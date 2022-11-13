@@ -2,9 +2,7 @@
 
 name: Release package
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,9 +18,13 @@ jobs:
       with:
         global-json-file: global.json
 
-    - name: Get build-id from tag
+    - name: Get version from tag
       id: parse-tag
       run: |
+        $gitRef=${{ github.ref }}
+        if (-not $gitRef.StartsWith("/refs/heads/tags")) {
+          throw "Must be started from version tag ref!"
+        }
         $officialBuildId="${{ github.ref_name }}".Split(".")[-2, -1] -Join "."
         "officialBuildId=$officialBuildId" >> $env:GITHUB_OUTPUT
       shell: pwsh
