@@ -64,6 +64,18 @@ jobs:
         path: |
           artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1/*.tgz
 
+    - name: Extract release notes
+      uses: ffurrer2/extract-release-notes@v1
+      with:
+        release_notes_file: RELEASE_NOTES.md
+
+    - name: Artifact release notes
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-notes
+        path: |
+          RELEASE_NOTES.md
+
   github-release:
     name: Github release
     runs-on: windows-latest
@@ -104,6 +116,6 @@ jobs:
         "filename=$package" >> $env:GITHUB_OUTPUT
       shell: pwsh
 
-    - run: npm publish {{ steps.npm-package.outputs.filename }}
+    - run: npm publish ${{ steps.npm-package.outputs.filename }}
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
