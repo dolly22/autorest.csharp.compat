@@ -78,7 +78,7 @@ jobs:
 
   github-release:
     name: Github release
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: build
 
     steps:
@@ -92,6 +92,23 @@ jobs:
       with:
         files: |
           *.tgz
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+        registry-url: 'https://npm.pkg.github.com'
+
+    - name: Extract npm tgz
+      run: tar -xvf *.tgz
+
+    - name: Publish to github registry
+      working-directory: ./package
+      run: |
+        # Change package name to github format
+        echo "$( jq '.name = "@dolly22/autorest-csharp-compat"' package.json )" > package.json
+        npm publish --@dolly22:registry=https://npm.pkg.github.com
+      env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   npm-release:
     name: NPM registry release
