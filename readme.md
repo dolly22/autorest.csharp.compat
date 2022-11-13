@@ -1,5 +1,7 @@
 # Enhanced V2 generator compatibility
 
+[![npm version](https://badge.fury.io/js/autorest-csharp-compat.svg)](https://badge.fury.io/js/autorest-csharp-compat)
+
 Autorest csharp `V3` generated code is pretty difficult to use for generic (non Azure sdk) API REST clients. This fork tries to address major issues and makes code generated with `generation1-convenience-client` more compatible with `V2` generated code.
 
 ## Compatibility options
