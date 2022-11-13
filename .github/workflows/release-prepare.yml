@@ -1,7 +1,7 @@
 # Prepare changelog for new release and tag sources
 
 name: Prepare release tag
-run-name: Prepare release from ref ${{ github.ref_name }}
+run-name: Prepare release tag on ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
