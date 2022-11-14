@@ -45,13 +45,14 @@ jobs:
         "AutoRest C# $devVersion" >> $env:GITHUB_STEP_SUMMARY
       shell: pwsh
 
-    - name: Create tag
-      uses: actions/github-script@v6
+    - name: Update changelog
+      uses: thomaseizinger/keep-a-changelog-new-release@v1
       with:
-        script: |
-          github.rest.git.createRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: 'refs/tags/${{ steps.version_npm.outputs.version }}',
-            sha: context.sha
-          })
+        tag: ${{ steps.version_npm.outputs.version }}
+
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        message: Update CHANGELOG.md for ${{ steps.version_npm.outputs.version }}
+        add: CHANGELOG.md
+        tag: ${{ steps.version_npm.outputs.version }} --force
