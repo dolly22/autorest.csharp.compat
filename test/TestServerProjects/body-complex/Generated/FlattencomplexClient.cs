@@ -15,7 +15,7 @@ using body_complex.Models;
 namespace body_complex
 {
     /// <summary> The Flattencomplex service client. </summary>
-    public partial class FlattencomplexClient
+    public partial class FlattencomplexClient : IFlattencomplexClient
     {
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly HttpPipeline _pipeline;

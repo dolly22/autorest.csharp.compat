@@ -15,7 +15,7 @@ using body_complex.Models;
 namespace body_complex
 {
     /// <summary> The Array service client. </summary>
-    public partial class ArrayClient
+    public partial class ArrayClient : IArrayClient
     {
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly HttpPipeline _pipeline;

@@ -16,12 +16,18 @@ Autorest `V3` no longer generates interfaces for convenience clients. You can en
 compat-client-interfaces: true
 ```
 
-### Anonymous client public constructor
+### Single client factory
 
-Enable this option to generate public constructor to create non authenticated Rest client instance. It's helpful when your api contains mix of authenticated and anonymous endpoints and you need option to create client with authentication or anonymous.
+Autorest `V2` created single interface and client implementation class for whole api client (multiple operation groups). Autorest `V3` not longer does and only generates clients per operation group.
+
+When `compat-client-factory` option is enabled, factory class and interface are generated and allow you to easily create api client for any operation group. If enable together with `compat-client-interfaces`, factory is typed to return client interfaces instead of concrete client classes.
+
+Generated factory always has public constructor which internally creates unauthenticated pipeline so you can more easily use clients with some authenticated and anonymous methods.
+
+See example [generated client](https://github.com/dolly22/autorest.csharp.compat/tree/feature/v3-compat/test/TestServerProjects/body-complex) for this [swagger.json](https://github.com/Azure/autorest.testserver/blob/main/swagger/body-complex.json) for more details.
 
 ```
-compat-anonymous-client-ctor: true
+compat-client-factory: true
 ```
 
 ### Handle custom error responses

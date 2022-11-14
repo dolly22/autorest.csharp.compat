@@ -15,7 +15,7 @@ using body_complex.Models;
 namespace body_complex
 {
     /// <summary> The Basic service client. </summary>
-    public partial class BasicClient
+    public partial class BasicClient : IBasicClient
     {
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly HttpPipeline _pipeline;

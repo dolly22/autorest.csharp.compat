@@ -211,9 +211,9 @@ namespace AutoRest.CSharp.AutoRest.Communication
                 projectPath ?? ReadStringOption(root, Configuration.Options.ProjectFolder),
                 protocolMethods,
                 suppressAbstractBaseClasses,
+                ReadOption(root, Configuration.Options.CompatClientFactory),
                 ReadOption(root, Configuration.Options.CompatClientInterfaces),
                 ReadOption(root, Configuration.Options.CompatErrorResponses),
-                ReadOption(root, Configuration.Options.CompatAnonymousClientCtor),
                 MgmtConfiguration.LoadConfiguration(root)
             );
         }

@@ -15,7 +15,7 @@ using body_complex.Models;
 namespace body_complex
 {
     /// <summary> The Readonlyproperty service client. </summary>
-    public partial class ReadonlypropertyClient
+    public partial class ReadonlypropertyClient : IReadonlypropertyClient
     {
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly HttpPipeline _pipeline;

@@ -4,6 +4,7 @@
 using System.Linq;
 using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Common.Output.Builders;
+using AutoRest.CSharp.DataPlane.Generation;
 using AutoRest.CSharp.Generation.Writers;
 using AutoRest.CSharp.Input;
 using AutoRest.CSharp.Input.Source;
@@ -26,6 +27,7 @@ namespace AutoRest.CSharp.AutoRest.Plugins
             var serializeWriter = new SerializationWriter();
             var headerModelModelWriter = new DataPlaneResponseHeaderGroupWriter();
             var longRunningOperationWriter = new LongRunningOperationWriter();
+            var clientFactoryWriter = new DataPlaneClientFactoryWriter();
 
             foreach (var model in library.Models)
             {
@@ -76,16 +78,25 @@ namespace AutoRest.CSharp.AutoRest.Plugins
                 var codeWriter = new CodeWriter();
                 clientWriter.WriteClient(codeWriter, client, library);
                 project.AddGeneratedFile($"{client.Type.Name}.cs", codeWriter.ToString());
+
+                if (client.ClientInterface is not null)
+                {
+                    var interfaceWriter = new CodeWriter();
+                    clientInterfaceWriter.WriteClientInterface(interfaceWriter, client, client.ClientInterface, library);
+                    project.AddGeneratedFile($"{client.ClientInterface.Type.Name}.cs", interfaceWriter.ToString());
+                }
             }
 
-            if (Configuration.CompatClientInterfaces)
+            if (library.DataPlaneClientFactory is not null)
             {
-                foreach (var client in library.Clients)
-                {
-                    var codeWriter = new CodeWriter();
-                    clientInterfaceWriter.WriteClientInterface(codeWriter, client, library);
-                    project.AddGeneratedFile($"I{client.Type.Name}.cs", codeWriter.ToString());
-                }
+                var codeWriter = new CodeWriter();
+                clientFactoryWriter.WriteClientFactory(codeWriter, library.DataPlaneClientFactory, library);
+
+                var interfaceWriter = new CodeWriter();
+                clientFactoryWriter.WriteClientFactoryInterface(interfaceWriter, library.DataPlaneClientFactory, library);
+
+                project.AddGeneratedFile($"{library.DataPlaneClientFactory.Type.Name}.cs", codeWriter.ToString());
+                project.AddGeneratedFile($"{library.DataPlaneClientFactory.ClientInterface.Type.Name}.cs", interfaceWriter.ToString());
             }
 
             foreach (var operation in library.LongRunningOperations)

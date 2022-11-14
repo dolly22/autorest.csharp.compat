@@ -10,6 +10,7 @@ using AutoRest.CSharp.Common.Decorator;
 using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Common.Output.Builders;
 using AutoRest.CSharp.Common.Output.Models;
+using AutoRest.CSharp.DataPlane.Output;
 using AutoRest.CSharp.Generation.Types;
 using AutoRest.CSharp.Input;
 using AutoRest.CSharp.Input.Source;
@@ -34,6 +35,7 @@ namespace AutoRest.CSharp.Output.Models.Types
         private readonly InputNamespace _input;
         private readonly SourceInputModel? _sourceInputModel;
         private readonly Lazy<ModelFactoryTypeProvider?> _modelFactory;
+        private readonly Lazy<DataPlaneClientFactory?> _dataPlaneClientFactory;
         private readonly string _defaultNamespace;
         private readonly string _libraryName;
 
@@ -55,7 +57,9 @@ namespace AutoRest.CSharp.Output.Models.Types
             _models = new CachedDictionary<Schema, TypeProvider>(() => BuildModels(codeModel));
             _modelFactory = new Lazy<ModelFactoryTypeProvider?>(() => ModelFactoryTypeProvider.TryCreate(_input, Models, _sourceInputModel));
             _protocolMethodsDictionary = new CachedDictionary<string, List<string>>(GetProtocolMethodsDictionary);
+            _dataPlaneClientFactory = new Lazy<DataPlaneClientFactory?>(() => DataPlaneClientFactory.TryCreate(_input.Clients, _context));
 
+            ClientShortName = ClientBuilder.GetClientPrefix(_libraryName, _input.Name);
             ClientOptions = CreateClientOptions();
             Authentication = _input.Auth;
         }
@@ -71,7 +75,9 @@ namespace AutoRest.CSharp.Output.Models.Types
             return new ClientOptionsTypeProvider(_sourceInputModel?.GetServiceVersionOverrides() ?? _input.ApiVersions, $"{clientPrefix}ClientOptions", _defaultNamespace, $"Client options for {clientPrefix}Client.", _sourceInputModel);
         }
 
+        public string ClientShortName { get; }
         public ModelFactoryTypeProvider? ModelFactory => _modelFactory.Value;
+        public DataPlaneClientFactory? DataPlaneClientFactory => _dataPlaneClientFactory.Value;
         public ClientOptionsTypeProvider? ClientOptions { get; }
         public InputAuth Authentication { get; }
         public IEnumerable<DataPlaneClient> Clients => _clients.Values;

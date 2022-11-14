@@ -26,15 +26,15 @@ namespace AutoRest.CSharp.Generation.Writers
 {
     internal class DataPlaneClientInterfaceWriter : ClientWriter
     {
-        public void WriteClientInterface(CodeWriter writer, DataPlaneClient client, DataPlaneOutputLibrary library)
+        public void WriteClientInterface(CodeWriter writer, DataPlaneClient client, DataPlaneClientInterface clientInterface, DataPlaneOutputLibrary library)
         {
-            var cs = client.Type;
+            var cs = clientInterface.Type;
             var @namespace = cs.Namespace;
             using (writer.Namespace(@namespace))
             {
                 writer.WriteXmlDocumentationSummary($"{client.Description}");
 
-                using (writer.Scope($"{client.Declaration.Accessibility} partial interface I{cs.Name}"))
+                using (writer.Scope($"{client.Declaration.Accessibility} partial interface {cs.Name}"))
                 {
                     foreach (var clientMethod in client.Methods)
                     {

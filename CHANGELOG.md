@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New compatibility option `compat-client-factory` to generate data plane client factory to easily create all operation group clients.
+
 ## [3.0.0-beta.20221113.1] - 2022-11-13
 
 ### Added

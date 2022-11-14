@@ -6,6 +6,7 @@ using System.Linq;
 using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Common.Output.Builders;
 using AutoRest.CSharp.Generation.Types;
+using AutoRest.CSharp.Input;
 using AutoRest.CSharp.Output.Builders;
 using AutoRest.CSharp.Output.Models.Requests;
 using AutoRest.CSharp.Output.Models.Shared;
@@ -34,8 +35,12 @@ namespace AutoRest.CSharp.Output.Models
             _context = context;
             DefaultName = clientPrefix + clientSuffix;
             ClientShortName = string.IsNullOrEmpty(clientPrefix) ? DefaultName : clientPrefix;
+
+            if (Configuration.CompatClientInterfaces)
+                ClientInterface = new DataPlaneClientInterface($"I{clientPrefix}{clientSuffix}", context);
         }
 
+        public DataPlaneClientInterface? ClientInterface { get; }
         public string ClientShortName { get; }
         protected override string DefaultName { get; }
         public string Description => BuilderHelpers.EscapeXmlDescription(ClientBuilder.CreateDescription(_inputClient.Description, ClientBuilder.GetClientPrefix(Declaration.Name, _context)));

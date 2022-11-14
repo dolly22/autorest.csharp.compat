@@ -15,7 +15,7 @@ using body_complex.Models;
 namespace body_complex
 {
     /// <summary> The Dictionary service client. </summary>
-    public partial class DictionaryClient
+    public partial class DictionaryClient : IDictionaryClient
     {
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly HttpPipeline _pipeline;

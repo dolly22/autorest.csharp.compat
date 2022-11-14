@@ -15,7 +15,7 @@ using body_complex.Models;
 namespace body_complex
 {
     /// <summary> The Inheritance service client. </summary>
-    public partial class InheritanceClient
+    public partial class InheritanceClient : IInheritanceClient
     {
         private readonly ClientDiagnostics _clientDiagnostics;
         private readonly HttpPipeline _pipeline;

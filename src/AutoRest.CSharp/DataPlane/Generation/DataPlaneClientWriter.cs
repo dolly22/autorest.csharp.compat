@@ -257,58 +257,6 @@ namespace AutoRest.CSharp.Generation.Writers
                 writer.Line();
             }
 
-            if (Configuration.CompatAnonymousClientCtor)
-            {
-                var ctorParams = client.GetClientConstructorParameters();
-                writer.WriteXmlDocumentationSummary($"Initializes a new instance of {client.Type.Name}");
-                foreach (Parameter parameter in ctorParams)
-                {
-                    writer.WriteXmlDocumentationParameter(parameter.Name, $"{parameter.Description}");
-                }
-                writer.WriteXmlDocumentationParameter(OptionsVariable, $"The options for configuring the client.");
-
-                writer.Append($"public {client.Type.Name:D}(");
-                foreach (Parameter parameter in ctorParams)
-                {
-                    writer.WriteParameter(parameter);
-                }
-                writer.Append($" {clientOptionsName} {OptionsVariable} = null)");
-
-                using (writer.Scope())
-                {
-                    writer.WriteParameterNullChecks(ctorParams);
-                    writer.Line();
-
-                    writer.Line($"{OptionsVariable} ??= new {clientOptionsName}();");
-                    writer.Line($"{ClientDiagnosticsField} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
-
-                    writer.Line($"{PipelineField} = {typeof(HttpPipelineBuilder)}.Build({OptionsVariable});");
-                    writer.Append($"this.RestClient = new {client.RestClient.Type}(");
-                    foreach (var parameter in client.RestClient.Parameters)
-                    {
-                        if (parameter.IsApiVersionParameter)
-                        {
-                            writer.Append($"{OptionsVariable}.Version, ");
-                        }
-                        else if (parameter == KnownParameters.ClientDiagnostics)
-                        {
-                            writer.Append($"{ClientDiagnosticsField}, ");
-                        }
-                        else if (parameter == KnownParameters.Pipeline)
-                        {
-                            writer.Append($"{PipelineField}, ");
-                        }
-                        else
-                        {
-                            writer.Append($"{parameter.Name}, ");
-                        }
-                    }
-                    writer.RemoveTrailingComma();
-                    writer.Append($");");
-                }
-                writer.Line();
-            }
-
             var internalConstructor = BuildInternalConstructor(client);
             writer.WriteMethodDocumentation(internalConstructor);
             using (writer.WriteMethodDeclaration(internalConstructor))

@@ -68,9 +68,9 @@ namespace AutoRest.TestServer.Tests.Mgmt.Unit
                 projectFolder: "/..",
                 protocolMethodList: Array.Empty<string>(),
                 suppressAbstractBaseClasses: Array.Empty<string>(),
+                compatClientFactory: false,
                 compatClientInterfaces: false,
                 compatErrorResponses: false,
-                compatAnonymousClientCtor: false,
                 mgmtConfiguration: mgmtConfiguration);
         }
 
