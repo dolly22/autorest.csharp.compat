@@ -53,6 +53,6 @@ jobs:
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
       with:
-        message: Update CHANGELOG.md for ${{ steps.version_npm.outputs.version }}
+        message: Update change for ${{ steps.version_npm.outputs.version }} release
         add: CHANGELOG.md
         tag: ${{ steps.version_npm.outputs.version }} --force
