@@ -34,11 +34,19 @@ namespace AutoRest.CSharp.Input
             public const string SkipSerializationFormatXml = "skip-serialization-format-xml";
             public const string DisablePaginationTopRenaming = "disable-pagination-top-renaming";
             public const string SuppressAbstractBaseClasses = "suppress-abstract-base-class";
+            public const string UnreferencedTypesHandling = "unreferenced-types-handling";
 
             // options added for compatibility with v2 generators
             public const string CompatClientFactory = "compat-client-factory";
             public const string CompatClientInterfaces = "compat-client-interfaces";
             public const string CompatErrorResponses = "compat-error-responses";
+        }
+
+        public enum UnreferencedTypesHandlingOption
+        {
+            RemoveOrInternalize = 0,
+            Internalize = 1,
+            KeepAll = 2
         }
 
         public static void Initialize(
@@ -56,6 +64,7 @@ namespace AutoRest.CSharp.Input
             bool singleTopLevelClient,
             bool skipSerializationFormatXml,
             bool disablePaginationTopRenaming,
+            UnreferencedTypesHandlingOption unreferencedTypesHandling,
             string? projectFolder,
             string[] protocolMethodList,
             IReadOnlyList<string> suppressAbstractBaseClasses,
@@ -76,6 +85,7 @@ namespace AutoRest.CSharp.Input
             SkipCSProjPackageReference = skipCSProjPackageReference;
             Generation1ConvenienceClient = generation1ConvenienceClient;
             SingleTopLevelClient = singleTopLevelClient;
+            UnreferencedTypesHandling = unreferencedTypesHandling;
 
             // compat options
             CompatClientFactory = compatClientFactory;
@@ -117,6 +127,7 @@ namespace AutoRest.CSharp.Input
         public static bool SingleTopLevelClient { get; private set; }
         public static bool SkipSerializationFormatXml { get; private set; }
         public static bool DisablePaginationTopRenaming { get; private set; }
+        public static UnreferencedTypesHandlingOption UnreferencedTypesHandling { get; private set; }
         public static bool CompatClientFactory { get; private set; }
         public static bool CompatClientInterfaces { get; private set; }
         public static bool CompatErrorResponses { get; private set; }
@@ -142,32 +153,55 @@ namespace AutoRest.CSharp.Input
                 ns: autoRest.GetValue<string?>(Options.Namespace).GetAwaiter().GetResult(),
                 name: autoRest.GetValue<string?>(Options.LibraryName).GetAwaiter().GetResult(),
                 sharedSourceFolders: GetRequiredOption<string[]>(autoRest, Options.SharedSourceFolders).Select(TrimFileSuffix).ToArray(),
-                saveInputs: GetOptionValue(autoRest, Options.SaveInputs),
-                azureArm: GetOptionValue(autoRest, Options.AzureArm),
-                publicClients: GetOptionValue(autoRest, Options.PublicClients),
-                modelNamespace: GetOptionValue(autoRest, Options.ModelNamespace),
-                headAsBoolean: GetOptionValue(autoRest, Options.HeadAsBoolean),
-                skipCSProjPackageReference: GetOptionValue(autoRest, Options.SkipCSProjPackageReference),
-                generation1ConvenienceClient: GetOptionValue(autoRest, Options.Generation1ConvenienceClient),
-                singleTopLevelClient: GetOptionValue(autoRest, Options.SingleTopLevelClient),
-                skipSerializationFormatXml: GetOptionValue(autoRest, Options.SkipSerializationFormatXml),
-                disablePaginationTopRenaming: GetOptionValue(autoRest, Options.DisablePaginationTopRenaming),
+                saveInputs: GetOptionBoolValue(autoRest, Options.SaveInputs),
+                azureArm: GetOptionBoolValue(autoRest, Options.AzureArm),
+                publicClients: GetOptionBoolValue(autoRest, Options.PublicClients),
+                modelNamespace: GetOptionBoolValue(autoRest, Options.ModelNamespace),
+                headAsBoolean: GetOptionBoolValue(autoRest, Options.HeadAsBoolean),
+                skipCSProjPackageReference: GetOptionBoolValue(autoRest, Options.SkipCSProjPackageReference),
+                generation1ConvenienceClient: GetOptionBoolValue(autoRest, Options.Generation1ConvenienceClient),
+                singleTopLevelClient: GetOptionBoolValue(autoRest, Options.SingleTopLevelClient),
+                skipSerializationFormatXml: GetOptionBoolValue(autoRest, Options.SkipSerializationFormatXml),
+                disablePaginationTopRenaming: GetOptionBoolValue(autoRest, Options.DisablePaginationTopRenaming),
+                unreferencedTypesHandling: GetOptionEnumValue<UnreferencedTypesHandlingOption>(autoRest, Options.UnreferencedTypesHandling),
                 projectFolder: autoRest.GetValue<string?>(Options.ProjectFolder).GetAwaiter().GetResult(),
                 protocolMethodList: autoRest.GetValue<string[]?>(Options.ProtocolMethodList).GetAwaiter().GetResult() ?? Array.Empty<string>(),
                 suppressAbstractBaseClasses: autoRest.GetValue<string[]?>(Options.SuppressAbstractBaseClasses).GetAwaiter().GetResult() ?? Array.Empty<string>(),
-                compatClientFactory: GetOptionValue(autoRest, Options.CompatClientFactory),
-                compatClientInterfaces: GetOptionValue(autoRest, Options.CompatClientInterfaces),
-                compatErrorResponses: GetOptionValue(autoRest, Options.CompatErrorResponses),
+                compatClientFactory: GetOptionBoolValue(autoRest, Options.CompatClientFactory),
+                compatClientInterfaces: GetOptionBoolValue(autoRest, Options.CompatClientInterfaces),
+                compatErrorResponses: GetOptionBoolValue(autoRest, Options.CompatErrorResponses),
                 mgmtConfiguration: MgmtConfiguration.GetConfiguration(autoRest)
             );
         }
 
-        private static bool GetOptionValue(IPluginCommunication autoRest, string option)
+        private static T GetOptionEnumValue<T>(IPluginCommunication autoRest, string option) where T : struct, Enum
         {
-            return autoRest.GetValue<bool?>(option).GetAwaiter().GetResult() ?? GetDefaultOptionValue(option)!.Value;
+            var enumStr = autoRest.GetValue<string?>(option).GetAwaiter().GetResult();
+            return GetOptionEnumValueFromString<T>(option, enumStr);
         }
 
-        public static bool? GetDefaultOptionValue(string option)
+        internal static T GetOptionEnumValueFromString<T>(string option, string? enumStrValue) where T : struct, Enum
+        {
+            if (Enum.TryParse<T>(enumStrValue, true, out var enumValue))
+            {
+                return enumValue;
+            }
+
+            return (T)GetDefaultEnumOptionValue(option)!;
+        }
+
+        public static Enum? GetDefaultEnumOptionValue(string option) => option switch
+        {
+            Options.UnreferencedTypesHandling => UnreferencedTypesHandlingOption.RemoveOrInternalize,
+            _ => null
+        };
+
+        private static bool GetOptionBoolValue(IPluginCommunication autoRest, string option)
+        {
+            return autoRest.GetValue<bool?>(option).GetAwaiter().GetResult() ?? GetDefaultBoolOptionValue(option)!.Value;
+        }
+
+        public static bool? GetDefaultBoolOptionValue(string option)
         {
             switch (option)
             {

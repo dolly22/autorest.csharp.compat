@@ -9,58 +9,38 @@ using System.Text.Json;
 using Azure;
 using Azure.Core;
 
-namespace LroBasicCadl.Models
+namespace CadlFirstTest.Models
 {
-    public partial class Project : IUtf8JsonSerializable
+    public partial class Friend : IUtf8JsonSerializable
     {
         void IUtf8JsonSerializable.Write(Utf8JsonWriter writer)
         {
             writer.WriteStartObject();
-            if (Optional.IsDefined(Description))
-            {
-                writer.WritePropertyName("description");
-                writer.WriteStringValue(Description);
-            }
-            if (Optional.IsDefined(Name))
-            {
-                writer.WritePropertyName("name");
-                writer.WriteStringValue(Name);
-            }
+            writer.WritePropertyName("name");
+            writer.WriteStringValue(Name);
             writer.WriteEndObject();
         }
 
-        internal static Project DeserializeProject(JsonElement element)
+        internal static Friend DeserializeFriend(JsonElement element)
         {
-            string id = default;
-            Optional<string> description = default;
-            Optional<string> name = default;
+            string name = default;
             foreach (var property in element.EnumerateObject())
             {
-                if (property.NameEquals("id"))
-                {
-                    id = property.Value.GetString();
-                    continue;
-                }
-                if (property.NameEquals("description"))
-                {
-                    description = property.Value.GetString();
-                    continue;
-                }
                 if (property.NameEquals("name"))
                 {
                     name = property.Value.GetString();
                     continue;
                 }
             }
-            return new Project(id, description, name);
+            return new Friend(name);
         }
 
         /// <summary> Deserializes the model from a raw response. </summary>
         /// <param name="response"> The response to deserialize the model from. </param>
-        internal static Project FromResponse(Response response)
+        internal static Friend FromResponse(Response response)
         {
             using var document = JsonDocument.Parse(response.Content);
-            return DeserializeProject(document.RootElement);
+            return DeserializeFriend(document.RootElement);
         }
 
         /// <summary> Convert into a Utf8JsonRequestContent. </summary>
