@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   Synced with origin branch `feature/v3`
+
 ## [3.0.0-beta.20221125.1] - 2022-11-25
 
 ### Added
