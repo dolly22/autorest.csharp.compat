@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Generation.Types;
 using AutoRest.CSharp.Input;
@@ -35,6 +34,7 @@ namespace AutoRest.CSharp.Output.Models.Types
         {
             _allowedValues = input.AllowedValues;
             _typeFactory = typeFactory;
+            _deprecated = input.Deprecated;
 
             DefaultName = input.Name.ToCleanName();
             DefaultAccessibility = input.Accessibility ?? defaultAccessibility;
@@ -62,7 +62,8 @@ namespace AutoRest.CSharp.Output.Models.Types
         public CSharpType ValueType { get; }
         public bool IsExtensible { get; }
         public bool IsStringValueType => ValueType.Equals(typeof(string));
-        public bool IsIntValueType => ValueType.Equals(typeof(Int32));
+        public bool IsIntValueType => ValueType.Equals(typeof(Int32)) || IsLongValueType;
+        public bool IsLongValueType => ValueType.Equals(typeof(Int64));
         public string? Description { get; }
         protected override string DefaultName { get; }
         protected override string DefaultAccessibility { get; }

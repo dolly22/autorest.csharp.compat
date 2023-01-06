@@ -12,6 +12,7 @@ require: $(this-folder)/../../../../readme.md
 input-file:
 - $(this-folder)/../specification/mockSwagger/keyvault.json
 - $(this-folder)/../specification/mockSwagger/managedHsm.json
+- $(this-folder)/../specification/mockSwagger/network.json
 - $(this-folder)/../specification/mockSwagger/providers.json
 - $(this-folder)/../specification/mockSwagger/authorization.json
 - $(this-folder)/../specification/mockSwagger/tenantActivityLogs_API.json
@@ -41,6 +42,7 @@ format-by-name-rules:
 
 rename-mapping:
   Type: EncryptionType
+  FirewallPolicyThreatIntelWhitelist.ipAddresses: -|ip-address
 
 directive:
   - from: swagger-document
