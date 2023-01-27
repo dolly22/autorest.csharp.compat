@@ -7,25 +7,25 @@
 
 using System.Collections.Generic;
 using System.Text.Json;
-using Azure;
 using Azure.Core;
+using MgmtPropertyBag;
 
-namespace Pagination.Models
+namespace MgmtPropertyBag.Models
 {
-    internal partial class PagedLedgerEntry
+    internal partial class BarListResult
     {
-        internal static PagedLedgerEntry DeserializePagedLedgerEntry(JsonElement element)
+        internal static BarListResult DeserializeBarListResult(JsonElement element)
         {
-            IReadOnlyList<LedgerEntry> value = default;
+            IReadOnlyList<BarData> value = default;
             Optional<string> nextLink = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("value"))
                 {
-                    List<LedgerEntry> array = new List<LedgerEntry>();
+                    List<BarData> array = new List<BarData>();
                     foreach (var item in property.Value.EnumerateArray())
                     {
-                        array.Add(LedgerEntry.DeserializeLedgerEntry(item));
+                        array.Add(BarData.DeserializeBarData(item));
                     }
                     value = array;
                     continue;
@@ -36,15 +36,7 @@ namespace Pagination.Models
                     continue;
                 }
             }
-            return new PagedLedgerEntry(value, nextLink);
-        }
-
-        /// <summary> Deserializes the model from a raw response. </summary>
-        /// <param name="response"> The response to deserialize the model from. </param>
-        internal static PagedLedgerEntry FromResponse(Response response)
-        {
-            using var document = JsonDocument.Parse(response.Content);
-            return DeserializePagedLedgerEntry(document.RootElement);
+            return new BarListResult(value, nextLink.Value);
         }
     }
 }

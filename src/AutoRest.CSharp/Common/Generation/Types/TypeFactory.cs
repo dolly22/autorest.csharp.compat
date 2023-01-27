@@ -34,6 +34,8 @@ namespace AutoRest.CSharp.Generation.Types
 
         public CSharpType CreateType(InputType inputType) => inputType switch
         {
+            InputLiteralType literalType       => CreateType(literalType.LiteralValueType), //TODO -- need to support literal type with the value.
+            InputUnionType unionType           => CreateType(unionType.UnionItemTypes[0]), //TODO -- need to support multiple union types.
             InputListType listType             => new CSharpType(typeof(IList<>), listType.IsNullable, CreateType(listType.ElementType)),
             InputDictionaryType dictionaryType => new CSharpType(typeof(IDictionary<,>), inputType.IsNullable, typeof(string), CreateType(dictionaryType.ValueType)),
             InputEnumType enumType             => _library.ResolveEnum(enumType).WithNullable(inputType.IsNullable),
@@ -62,6 +64,7 @@ namespace AutoRest.CSharp.Generation.Types
                 InputTypeKind.Guid => new CSharpType(typeof(Guid), inputType.IsNullable),
                 InputTypeKind.Int32 => new CSharpType(typeof(int), inputType.IsNullable),
                 InputTypeKind.Int64 => new CSharpType(typeof(long), inputType.IsNullable),
+                InputTypeKind.IPAddress => new CSharpType(typeof(IPAddress), inputType.IsNullable),
                 InputTypeKind.RequestMethod => new CSharpType(typeof(RequestMethod), inputType.IsNullable),
                 InputTypeKind.ResourceIdentifier => new CSharpType(typeof(ResourceIdentifier), inputType.IsNullable),
                 InputTypeKind.ResourceType => new CSharpType(typeof(ResourceType), inputType.IsNullable),

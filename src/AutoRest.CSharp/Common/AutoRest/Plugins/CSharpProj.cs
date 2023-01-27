@@ -89,7 +89,7 @@ namespace AutoRest.CSharp.AutoRest.Plugins
         }
         public async Task<bool> Execute(IPluginCommunication autoRest)
         {
-            string codeModelFileName = (await autoRest.ListInputs()).FirstOrDefault();
+            string? codeModelFileName = (await autoRest.ListInputs()).FirstOrDefault();
             if (string.IsNullOrEmpty(codeModelFileName))
                 throw new Exception("Generator did not receive the code model file.");
 
@@ -129,7 +129,7 @@ namespace AutoRest.CSharp.AutoRest.Plugins
     <PackageReference Include=""Azure.Core.Expressions.DataFactory"" Version=""1.0.0-alpha.20221121.1"" />
   </ItemGroup>";
             }
-            var isTestProject = Configuration.MgmtConfiguration.TestGen is not null;
+            var isTestProject = Configuration.MgmtTestConfiguration is not null;
             if (isTestProject)
             {
                 _coreCsProjContent += string.Format(@"

@@ -47,7 +47,6 @@ namespace AutoRest.TestServer.Tests.Mgmt.Unit
                 resourceModelRequiresType: default,
                 resourceModelRequiresName: default,
                 singletonRequiresKeyword: default,
-                testGen: default,
                 operationIdMappings: default,
                 updateRequiredCopy: default,
                 patchInitializerCustomization: default);
@@ -73,6 +72,7 @@ namespace AutoRest.TestServer.Tests.Mgmt.Unit
                 compatClientInterfaces: false,
                 compatErrorResponses: false,
                 mgmtConfiguration: mgmtConfiguration);
+                mgmtTestConfiguration: null);
         }
 
         private static RequestPath GetFromString(string path) => new RequestPath(path.Split('/', StringSplitOptions.RemoveEmptyEntries).Select(segment => GetSegmentFromString(segment)).ToList());

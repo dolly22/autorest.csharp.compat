@@ -212,6 +212,10 @@ namespace AutoRest.CSharp.Generation.Writers
         {
             writer.Append($"{property.Declaration.Accessibility} {property.Declaration.Type} {property.Declaration.Name:D}");
             writer.AppendRaw(property.IsReadOnly ? "{ get; }" : "{ get; set; }");
+            if (property.DefaultValue != null)
+            {
+                writer.AppendRaw(" = ").Append(property.DefaultValue).Line($";");
+            }
         }
 
         private FormattableString CreatePropertyDescription(ObjectTypeProperty property, string? overrideName = null)
@@ -287,12 +291,18 @@ Examples:
 
         protected virtual void AddClassAttributes(CodeWriter writer, ObjectType schema)
         {
-            writer.WriteDeprecatedAttributeIfExists(schema.Deprecated);
+            if (schema.Deprecated != null)
+            {
+                writer.Line($"[{typeof(ObsoleteAttribute)}(\"{schema.Deprecated}\")]");
+            }
         }
 
         private void AddClassAttributes(CodeWriter writer, EnumType enumType)
         {
-            writer.WriteDeprecatedAttributeIfExists(enumType.Deprecated);
+            if (enumType.Deprecated != null)
+            {
+                writer.Line($"[{typeof(ObsoleteAttribute)}(\"{enumType.Deprecated}\")]");
+            }
         }
 
         protected virtual void AddCtorAttribute(CodeWriter writer, ObjectType schema, ObjectTypeConstructor constructor)
