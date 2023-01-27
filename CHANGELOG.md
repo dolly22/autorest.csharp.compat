@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   Synced with origin branch `feature/v3`
+-   Update to net6.0
+-   Adapt to upstream ClientDiagnosticsField changes
+
 ## [3.0.0-beta.20230106.1] - 2023-01-06
 
 ### Added

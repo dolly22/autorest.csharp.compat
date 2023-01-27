@@ -71,7 +71,7 @@ namespace AutoRest.TestServer.Tests.Mgmt.Unit
                 compatClientFactory: false,
                 compatClientInterfaces: false,
                 compatErrorResponses: false,
-                mgmtConfiguration: mgmtConfiguration);
+                mgmtConfiguration: mgmtConfiguration,
                 mgmtTestConfiguration: null);
         }
 

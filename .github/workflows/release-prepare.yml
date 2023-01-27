@@ -25,7 +25,7 @@ jobs:
         global-json-file: global.json
     - uses: actions/setup-node@v3
       with:
-        node-version: '16.x'
+        node-version: '18.x'
 
     # Theoretically it's not needed to build here, but there are some prerelease version format check we would like to use
     - name: Build dotnet
@@ -37,7 +37,7 @@ jobs:
 
     - name: Determine base npm version
       id: version_npm
-      working-directory: ./artifacts/bin/AutoRest.CSharp/Debug/netcoreapp3.1
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Debug/net6.0
       run: |
         $currentVersion = node -p -e "require('./package.json').version";
         $devVersion = "v$currentVersion-beta.${{ inputs.prerelease_version }}"

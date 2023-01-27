@@ -39,7 +39,7 @@ jobs:
 
     - name: Update npm version
       id: version_npm
-      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/net6.0
       run: |
         $packageVersion="${{ github.ref_name }}".TrimStart("v")
         npm version --no-git-tag-version $packageVersion
@@ -50,11 +50,11 @@ jobs:
       with:
         name: autorest-csharp
         path: |
-          artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+          artifacts/bin/AutoRest.CSharp/Release/net6.0
 
     - name: Pack npm
       id: pack_npm
-      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1
+      working-directory: ./artifacts/bin/AutoRest.CSharp/Release/net6.0
       run: npm pack -q
 
     - name: Artifact npm
@@ -62,7 +62,7 @@ jobs:
       with:
         name: autorest-csharp-npm
         path: |
-          artifacts/bin/AutoRest.CSharp/Release/netcoreapp3.1/*.tgz
+          artifacts/bin/AutoRest.CSharp/Release/net6.0/*.tgz
 
     - name: Extract release notes
       uses: ffurrer2/extract-release-notes@v1
@@ -130,7 +130,7 @@ jobs:
 
     - uses: actions/setup-node@v3
       with:
-        node-version: '16.x'
+        node-version: '18.x'
         registry-url: 'https://registry.npmjs.org'
 
     - run: npm publish --access=public *.tgz

@@ -64,7 +64,7 @@ namespace AutoRest.CSharp.DataPlane.Generation
         {
             writer.Line($"private readonly {typeof(Uri)} {EndpointField};");
             writer.Line($"private readonly {clientOptions.Type} {OptionsField};");
-            writer.Line($"private readonly {typeof(ClientDiagnostics)} {ClientDiagnosticsField};");
+            writer.Line($"private readonly {typeof(ClientDiagnostics)} {ClientDiagnosticsField.GetReferenceFormattable()};");
             writer.Line($"private readonly {typeof(HttpPipeline)} {PipelineField};");
         }
 
@@ -112,7 +112,7 @@ namespace AutoRest.CSharp.DataPlane.Generation
                     writer.Line();
 
                     writer.Line($"{OptionsVariable} ??= new {clientOptionsName}();");
-                    writer.Line($"{ClientDiagnosticsField} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
+                    writer.Line($"{ClientDiagnosticsField.GetReferenceFormattable()} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
                     writer.Line($"{PipelineField} = {typeof(HttpPipelineBuilder)}.Build({OptionsVariable}, new {typeof(AzureKeyCredentialPolicy)}({CredentialVariable}, \"{library.Authentication.ApiKey.Name}\"));");
                     writer.Line($"{EndpointField} = {EndpointVariable};");
                     writer.Line($"{OptionsField} = {OptionsVariable};");
@@ -144,7 +144,7 @@ namespace AutoRest.CSharp.DataPlane.Generation
                     writer.Line();
 
                     writer.Line($"{OptionsVariable} ??= new {clientOptionsName}();");
-                    writer.Line($"{ClientDiagnosticsField} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
+                    writer.Line($"{ClientDiagnosticsField.GetReferenceFormattable()} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
                     var scopesParam = new CodeWriterDeclaration("scopes");
                     writer.Append($"string[] {scopesParam:D} = ");
                     writer.Append($"{{ ");
@@ -185,7 +185,7 @@ namespace AutoRest.CSharp.DataPlane.Generation
                     writer.Line();
 
                     writer.Line($"{OptionsVariable} ??= new {clientOptionsName}();");
-                    writer.Line($"{ClientDiagnosticsField} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
+                    writer.Line($"{ClientDiagnosticsField.GetReferenceFormattable()} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
 
                     writer.Line($"{PipelineField} = {typeof(HttpPipelineBuilder)}.Build({OptionsVariable});");
                     writer.Line($"{EndpointField} = {EndpointVariable};");
@@ -213,7 +213,7 @@ namespace AutoRest.CSharp.DataPlane.Generation
                 }
                 else if (parameter == KnownParameters.ClientDiagnostics)
                 {
-                    writer.Append($"{ClientDiagnosticsField}, ");
+                    writer.Append($"{ClientDiagnosticsField.GetReferenceFormattable()}, ");
                 }
                 else if (parameter == KnownParameters.Pipeline)
                 {
