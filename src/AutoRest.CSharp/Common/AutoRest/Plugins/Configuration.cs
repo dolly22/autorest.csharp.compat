@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using AutoRest.CSharp.AutoRest.Communication;
+using Azure.Core;
 
 namespace AutoRest.CSharp.Input
 {
@@ -37,6 +38,8 @@ namespace AutoRest.CSharp.Input
             public const string UnreferencedTypesHandling = "unreferenced-types-handling";
             public const string ModelFactoryForHlc = "model-factory-for-hlc";
             public const string GenerateModelFactory = "generate-model-factory";
+            public const string ModelsToTreatEmptyStringAsNull = "models-to-treat-empty-string-as-null";
+            public const string AdditionalIntrinsicTypesToTreatEmptyStringAsNull = "additional-intrinsic-types-to-treat-empty-string-as-null";
 
             // options added for compatibility with v2 generators
             public const string CompatClientFactory = "compat-client-factory";
@@ -72,6 +75,8 @@ namespace AutoRest.CSharp.Input
             string? projectFolder,
             IReadOnlyList<string> protocolMethodList,
             IReadOnlyList<string> suppressAbstractBaseClasses,
+            IReadOnlyList<string> modelsToTreatEmptyStringAsNull,
+            IReadOnlyList<string> additionalIntrinsicTypesToTreatEmptyStringAsNull,
             bool compatClientFactory,
             bool compatClientInterfaces,
             bool compatErrorResponses,
@@ -108,6 +113,27 @@ namespace AutoRest.CSharp.Input
             {
                 _absoluteProjectFolder = Path.GetFullPath(Path.Combine(outputFolder, projectFolder));
             }
+
+            if (publicClients && generation1ConvenienceClient)
+            {
+                var binaryLocation = typeof(Configuration).Assembly.Location;
+                if (!binaryLocation.EndsWith(Path.Combine("artifacts", "bin", "AutoRest.CSharp", "Debug", "net6.0", "AutoRest.CSharp.dll")))
+                {
+                    if (_absoluteProjectFolder is not null)
+                    {
+                        //TODO Remove after resolving https://github.com/Azure/autorest.csharp/issues/3151
+                        var absoluteProjectFolderSPlit = new HashSet<string>(_absoluteProjectFolder.Split(Path.DirectorySeparatorChar), StringComparer.Ordinal);
+                        if (!absoluteProjectFolderSPlit.Contains("src") ||
+                            (!absoluteProjectFolderSPlit.Contains("Azure.Analytics.Synapse.Spark") &&
+                            !absoluteProjectFolderSPlit.Contains("Azure.Analytics.Synapse.Monitoring") &&
+                            !absoluteProjectFolderSPlit.Contains("Azure.Analytics.Synapse.ManagedPrivateEndpoints") &&
+                            !absoluteProjectFolderSPlit.Contains("Azure.Analytics.Synapse.Artifacts") &&
+                            !absoluteProjectFolderSPlit.Contains("Azure.Communication.PhoneNumbers")))
+                            throw new Exception($"Unsupported combination of settings both {Options.PublicClients} and {Options.Generation1ConvenienceClient} cannot be true at the same time.");
+                    }
+                }
+            }
+
             _relativeProjectFolder = projectFolder;
             _protocolMethodList = protocolMethodList;
             SkipSerializationFormatXml = skipSerializationFormatXml;
@@ -116,6 +142,8 @@ namespace AutoRest.CSharp.Input
             _mgmtConfiguration = mgmtConfiguration;
             MgmtTestConfiguration = mgmtTestConfiguration;
             _suppressAbstractBaseClasses = suppressAbstractBaseClasses;
+            _modelsToTreatEmptyStringAsNull = new HashSet<string>(modelsToTreatEmptyStringAsNull);
+            _intrinsicTypesToTreatEmptyStringAsNull.UnionWith(additionalIntrinsicTypesToTreatEmptyStringAsNull);
         }
 
         private static string? _outputFolder;
@@ -148,6 +176,12 @@ namespace AutoRest.CSharp.Input
 
         private static IReadOnlyList<string>? _protocolMethodList;
         public static IReadOnlyList<string> ProtocolMethodList => _protocolMethodList ?? throw new InvalidOperationException("Configuration has not been initialized");
+
+        private static HashSet<string>? _modelsToTreatEmptyStringAsNull;
+        public static HashSet<string> ModelsToTreatEmptyStringAsNull => _modelsToTreatEmptyStringAsNull ?? throw new InvalidOperationException("Configuration has not been initialized");
+
+        private static HashSet<string> _intrinsicTypesToTreatEmptyStringAsNull = new HashSet<string>() { nameof(Uri), nameof(Guid), nameof(ResourceIdentifier), nameof(DateTimeOffset) };
+        public static HashSet<string> IntrinsicTypesToTreatEmptyStringAsNull => _intrinsicTypesToTreatEmptyStringAsNull;
 
         private static MgmtConfiguration? _mgmtConfiguration;
         public static MgmtConfiguration MgmtConfiguration => _mgmtConfiguration ?? throw new InvalidOperationException("Configuration has not been initialized");
@@ -182,6 +216,8 @@ namespace AutoRest.CSharp.Input
                 projectFolder: autoRest.GetValue<string?>(Options.ProjectFolder).GetAwaiter().GetResult(),
                 protocolMethodList: autoRest.GetValue<string[]?>(Options.ProtocolMethodList).GetAwaiter().GetResult() ?? Array.Empty<string>(),
                 suppressAbstractBaseClasses: autoRest.GetValue<string[]?>(Options.SuppressAbstractBaseClasses).GetAwaiter().GetResult() ?? Array.Empty<string>(),
+                modelsToTreatEmptyStringAsNull: autoRest.GetValue<string[]?>(Options.ModelsToTreatEmptyStringAsNull).GetAwaiter().GetResult() ?? Array.Empty<string>(),
+                additionalIntrinsicTypesToTreatEmptyStringAsNull: autoRest.GetValue<string[]?>(Options.AdditionalIntrinsicTypesToTreatEmptyStringAsNull).GetAwaiter().GetResult() ?? Array.Empty<string>(),
                 compatClientFactory: GetOptionBoolValue(autoRest, Options.CompatClientFactory),
                 compatClientInterfaces: GetOptionBoolValue(autoRest, Options.CompatClientInterfaces),
                 compatErrorResponses: GetOptionBoolValue(autoRest, Options.CompatErrorResponses),
