@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-beta.20231114.1] - 2023-11-14
+
 -   Synced with origin branch `feature/v3`
 -   Change how `compat-client-factory` generates constructors
 
@@ -40,7 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   Enhanced v2 compatibility options, see [readme](./readme.md) for more details
 
-[Unreleased]: https://github.com/dolly22/autorest.csharp.compat/compare/v3.0.0-beta.20230127.1...HEAD
+[Unreleased]: https://github.com/dolly22/autorest.csharp.compat/compare/v3.0.0-beta.20231114.1...HEAD
+
+[3.0.0-beta.20231114.1]: https://github.com/dolly22/autorest.csharp.compat/compare/v3.0.0-beta.20230127.1...v3.0.0-beta.20231114.1
 
 [3.0.0-beta.20230127.1]: https://github.com/dolly22/autorest.csharp.compat/compare/v3.0.0-beta.20230106.1...v3.0.0-beta.20230127.1
 
