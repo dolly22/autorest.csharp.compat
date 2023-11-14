@@ -3,76 +3,75 @@
 
 import { isFixed } from "@azure-tools/typespec-azure-core";
 import {
+    SdkContext,
+    getClientType,
+    isInternal
+} from "@azure-tools/typespec-client-generator-core";
+import {
     EncodeData,
     Enum,
     EnumMember,
-    getDoc,
-    getDeprecated,
-    getEffectiveModelType,
-    getEncode,
-    getFormat,
-    getKnownValues,
-    getVisibility,
+    IntrinsicType,
     Model,
     ModelProperty,
     Namespace,
     NeverType,
     Operation,
     Program,
-    resolveUsages,
+    Scalar,
     Type,
+    Union,
     UsageFlags,
+    getDeprecated,
     getDiscriminator,
-    IntrinsicType,
-    isVoidType,
+    getDoc,
+    getEffectiveModelType,
+    getEncode,
+    getFormat,
+    getKnownValues,
+    getProjectedNames,
+    getVisibility,
     isArrayModelType,
     isRecordModelType,
-    Scalar,
-    Union,
-    getProjectedNames
+    isVoidType,
+    resolveUsages
 } from "@typespec/compiler";
-import { getResourceOperation } from "@typespec/rest";
 import {
+    HttpOperation,
     getHeaderFieldName,
     getPathParamName,
     getQueryParamName,
-    HttpOperation,
     isStatusCode
 } from "@typespec/http";
+import { getResourceOperation } from "@typespec/rest";
 import {
-    projectedNameClientKey,
     projectedNameCSharpKey,
+    projectedNameClientKey,
     projectedNameJsonKey
 } from "../constants.js";
+import { FormattedType } from "../type/formattedType.js";
 import { InputEnumTypeValue } from "../type/inputEnumTypeValue.js";
 import { InputModelProperty } from "../type/inputModelProperty.js";
 import {
     InputDictionaryType,
     InputEnumType,
+    InputIntrinsicType,
     InputListType,
     InputLiteralType,
     InputModelType,
+    InputNullType,
     InputPrimitiveType,
     InputType,
     InputUnionType,
-    InputNullType,
-    InputIntrinsicType,
     InputUnknownType,
     isInputEnumType,
     isInputLiteralType
 } from "../type/inputType.js";
 import { InputTypeKind } from "../type/inputTypeKind.js";
+import { LiteralTypeContext } from "../type/literalTypeContext.js";
 import { Usage } from "../type/usage.js";
 import { logger } from "./logger.js";
-import {
-    SdkContext,
-    getLibraryName,
-    getSdkSimpleType,
-    isInternal
-} from "@azure-tools/typespec-client-generator-core";
-import { capitalize, getModelName, getNameForTemplate } from "./utils.js";
-import { FormattedType } from "../type/formattedType.js";
-import { LiteralTypeContext } from "../type/literalTypeContext.js";
+import { capitalize, getModelName } from "./utils.js";
 /**
  * Map calType to csharp InputTypeKind
  */
@@ -142,6 +141,13 @@ function getCSharpInputTypeKindByIntrinsicModelName(
             return InputTypeKind.Float32;
         case "float64":
             return InputTypeKind.Float64;
+        case "uri":
+        case "url":
+            return InputTypeKind.Uri;
+        case "uuid":
+            return InputTypeKind.Guid;
+        case "etag":
+            return InputTypeKind.String;
         case "string":
             switch (format?.toLowerCase()) {
                 case "date":
@@ -307,12 +313,12 @@ export function getInputType(
             // In such cases, we don't want to emit a ref and instead just
             // emit the base type directly.
             default:
-                const sdkType = getSdkSimpleType(context, type);
+                const sdkType = getClientType(context, type);
                 return {
                     Name: type.name,
                     Kind: getCSharpInputTypeKindByIntrinsicModelName(
                         sdkType.kind,
-                        sdkType.format ?? formattedType.format,
+                        formattedType.format,
                         formattedType.encode
                     ),
                     IsNullable: false
@@ -350,12 +356,12 @@ export function getInputType(
             }
             extensibleEnum = {
                 Name: m.name,
+                EnumValueType: innerEnum.EnumValueType, //EnumValueType and  AllowedValues should be the first field after id and name, so that it can be corrected serialized.
+                AllowedValues: innerEnum.AllowedValues,
                 Namespace: getFullNamespaceString(e.namespace),
                 Accessibility: undefined, //TODO: need to add accessibility
                 Deprecated: getDeprecated(program, m),
                 Description: getDoc(program, m),
-                EnumValueType: innerEnum.EnumValueType,
-                AllowedValues: innerEnum.AllowedValues,
                 IsExtensible: !isFixed(program, e),
                 IsNullable: false
             } as InputEnumType;
@@ -414,12 +420,12 @@ export function getInputType(
             ];
             const enumType = {
                 Name: enumName,
+                EnumValueType: enumValueType, //EnumValueType and  AllowedValues should be the first field after id and name, so that it can be corrected serialized.
+                AllowedValues: allowValues,
                 Namespace: literalContext.Namespace,
                 Accessibility: undefined,
                 Deprecated: undefined,
                 Description: `The ${enumName}`, // TODO -- what should we put here?
-                EnumValueType: enumValueType,
-                AllowedValues: allowValues,
                 IsExtensible: true,
                 IsNullable: false
             } as InputEnumType;
@@ -463,12 +469,12 @@ export function getInputType(
 
             enumType = {
                 Name: e.name,
+                EnumValueType: enumValueType, //EnumValueType and  AllowedValues should be the first field after id and name, so that it can be corrected serialized.
+                AllowedValues: allowValues,
                 Namespace: getFullNamespaceString(e.namespace),
                 Accessibility: undefined, //TODO: need to add accessibility
                 Deprecated: getDeprecated(program, e),
                 Description: getDoc(program, e) ?? "",
-                EnumValueType: enumValueType,
-                AllowedValues: allowValues,
                 IsExtensible: !isFixed(program, e),
                 IsNullable: false
             } as InputEnumType;
@@ -539,7 +545,11 @@ export function getInputType(
                 Properties: properties // DerivedModels should be the last assigned to model, if no derived models, properties should be the last
             } as InputModelType;
 
-            models.set(name, model);
+            // open generic type model which has un-instanced template parameter will not be generated. e.g.
+            // model GenericModel<T> { value: T }
+            if (m.isFinished) {
+                models.set(name, model);
+            }
 
             // Resolve properties after model is added to the map to resolve possible circular dependencies
             addModelProperties(model, m.properties, properties);
@@ -548,13 +558,19 @@ export function getInputType(
             if (m.derivedModels !== undefined && m.derivedModels.length > 0) {
                 model.DerivedModels = [];
                 for (const dm of m.derivedModels) {
-                    const derivedModel = getInputType(
-                        context,
-                        getFormattedType(program, dm),
-                        models,
-                        enums
-                    );
-                    model.DerivedModels.push(derivedModel as InputModelType);
+                    // skip open generic type model which has un-instanced template parameter. e.g.
+                    // model GenericModel<T> { value: T }
+                    if (dm.isFinished) {
+                        const derivedModel = getInputType(
+                            context,
+                            getFormattedType(program, dm),
+                            models,
+                            enums
+                        );
+                        model.DerivedModels.push(
+                            derivedModel as InputModelType
+                        );
+                    }
                 }
             }
         }
