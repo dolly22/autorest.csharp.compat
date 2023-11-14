@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -33,7 +34,32 @@ namespace AutoRest.CSharp.Generation.Writers.Tests
         [OneTimeSetUp]
         public void init()
         {
-            Configuration.Initialize("Generated", "", "", new string[] { }, false, false, true, false, false, false, false, false, false, false, Configuration.UnreferencedTypesHandlingOption.RemoveOrInternalize, ".", new string[] { }, new List<string>(), false, false, false, null, null);
+            Configuration.Initialize(
+                outputFolder: "Generated",
+                ns: "",
+                name: "",
+                sharedSourceFolders: Array.Empty<string>(),
+                saveInputs: false,
+                azureArm: false,
+                publicClients: true,
+                modelNamespace: false,
+                headAsBoolean: false,
+                skipCSProjPackageReference: false,
+                generation1ConvenienceClient: false,
+                singleTopLevelClient: false,
+                skipSerializationFormatXml: false,
+                disablePaginationTopRenaming: false,
+                generateModelFactory: true,
+                modelFactoryForHlc: Array.Empty<string>(),
+                unreferencedTypesHandling: Configuration.UnreferencedTypesHandlingOption.RemoveOrInternalize,
+                projectFolder: ".",
+                protocolMethodList: Array.Empty<string>(),
+                suppressAbstractBaseClasses: Array.Empty<string>(),
+                compatClientFactory: false,
+                compatClientInterfaces: false,
+                compatErrorResponses: false,
+                mgmtConfiguration: null,
+                mgmtTestConfiguration: null);
         }
 
 
