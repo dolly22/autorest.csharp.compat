@@ -185,28 +185,14 @@ namespace AutoRest.CSharp.Generation.Writers
                     }
                 }
 
+
                 // Default case already written, no need to continue
                 if (defaultResponseDone)
                     return;
 
-                if (clientDiagnosticsField != null)
-                {
-                    writer.Line($"default:");
-                    if (async)
-                    {
-                        writer.Line($"throw await {clientDiagnosticsField.Name}.{nameof(ClientDiagnostics.CreateRequestFailedExceptionAsync)}({responseVariable}).ConfigureAwait(false);");
-                    }
-                    else
-                    {
-                        writer.Line($"throw {clientDiagnosticsField.Name}.{nameof(ClientDiagnostics.CreateRequestFailedException)}({responseVariable});");
-                    }
-                }
-                else
-                {
-                    writer
-                        .Line($"default:")
-                        .Line($"throw new {typeof(RequestFailedException)}({responseVariable});");
-                }
+                writer
+                    .Line($"default:")
+                    .Line($"throw new {typeof(RequestFailedException)}({responseVariable});");
             }
         }
 

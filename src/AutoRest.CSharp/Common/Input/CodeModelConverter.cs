@@ -137,7 +137,8 @@ namespace AutoRest.CSharp.Common.Input
             Explode: input.Protocol.Http is HttpParameter { Explode: true },
             SkipUrlEncoding: input.Extensions?.SkipEncoding ?? false,
             HeaderCollectionPrefix: input.Extensions?.HeaderCollectionPrefix,
-            VirtualParameter: input is VirtualParameter { Schema: not ConstantSchema } vp ? vp : null
+            VirtualParameter: input is VirtualParameter { Schema: not ConstantSchema } vp ? vp : null,
+            SerializationFormat: BuilderHelpers.GetSerializationFormat(input.Schema)
         );
 
 
@@ -383,7 +384,7 @@ namespace AutoRest.CSharp.Common.Input
             { Type: AllSchemaTypes.String } when format == XMsFormat.Object => InputPrimitiveType.Object,
             { Type: AllSchemaTypes.String } when format == XMsFormat.IPAddress => InputPrimitiveType.IPAddress,
 
-            ConstantSchema constantSchema => CreateType(constantSchema.ValueType, format, modelsCache),
+            ConstantSchema constantSchema => CreateLiteralType(constantSchema, format, modelsCache),
 
             CredentialSchema => InputPrimitiveType.String,
             { Type: AllSchemaTypes.String } => InputPrimitiveType.String,
@@ -398,8 +399,35 @@ namespace AutoRest.CSharp.Common.Input
             DictionarySchema dictionary when IsDPG => new InputDictionaryType(dictionary.Name, InputPrimitiveType.String, CreateType(dictionary.ElementType, modelsCache, dictionary.NullableItems ?? false)),
             ObjectSchema objectSchema when IsDPG && modelsCache != null => modelsCache[objectSchema],
 
+            AnySchema when IsDPG => InputIntrinsicType.Unknown,
+            AnyObjectSchema when IsDPG => InputIntrinsicType.Unknown,
+
             _ => new CodeModelType(schema)
         };
+
+        private static InputLiteralType CreateLiteralType(ConstantSchema constantSchema, string? format, IReadOnlyDictionary<ObjectSchema, InputModelType>? modelsCache)
+        {
+            var valueType = CreateType(constantSchema.ValueType, format, modelsCache);
+            // normalize the value, because the "value" coming from the code model is always a string
+            var kind = valueType switch
+            {
+                InputPrimitiveType primitiveType => primitiveType.Kind,
+                InputEnumType enumType => enumType.EnumValueType.Kind,
+                _ => throw new InvalidCastException($"Unknown value type {valueType.GetType()} for literal types")
+            };
+            var rawValue = constantSchema.Value.Value;
+            object normalizedValue = kind switch
+            {
+                InputTypeKind.Boolean => bool.Parse(rawValue.ToString()!),
+                InputTypeKind.Int32 => int.Parse(rawValue.ToString()!),
+                InputTypeKind.Int64 => long.Parse(rawValue.ToString()!),
+                InputTypeKind.Float32 => float.Parse(rawValue.ToString()!),
+                InputTypeKind.Float64 => double.Parse(rawValue.ToString()!),
+                _ => rawValue
+            };
+
+            return new InputLiteralType("Literal", valueType, normalizedValue);
+        }
 
         public static InputEnumType CreateEnumType(Schema schema, PrimitiveSchema choiceType, IEnumerable<ChoiceValue> choices, bool isExtensible) => new(
             Name: schema.Name,
