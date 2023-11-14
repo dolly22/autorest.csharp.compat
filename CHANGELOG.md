@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+-   Synced with origin branch `feature/v3`
+-   Change how `compat-client-factory` generates constructors
+
 ## [3.0.0-beta.20230127.1] - 2023-01-27
 
 ### Added

@@ -11,7 +11,6 @@ using AutoRest.CSharp.Output.Models.Requests;
 using AutoRest.CSharp.Output.Models.Responses;
 using AutoRest.CSharp.Output.Models.Shared;
 using Azure.Core;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoRest.CSharp.Generation.Writers
 {
@@ -43,23 +42,6 @@ namespace AutoRest.CSharp.Generation.Writers
 
             var responseBody = response.ResponseBody;
             ReferenceOrConstant value = default;
-
-            // Error responses are retuned as thrown exceptions
-            if (response.IsErrorResponse)
-            {
-                switch (responseBody)
-                {
-                    case ObjectResponseBody objectResponseBody:
-                        writer.Append($"throw ErrorResponseExceptionFactory.Create<{value.Type}>(");
-                        writer.WriteReferenceOrConstant(value);
-                        writer.Line($", {responseVariable});");
-                        break;
-
-                    default:
-                        throw new InvalidOperationException("Error response must by of ObjectResponseBody type");
-                }
-                return;
-            }
 
             var valueVariable = new CodeWriterDeclaration("value");
             switch (responseBody)
@@ -102,6 +84,23 @@ namespace AutoRest.CSharp.Generation.Writers
 
                         break;
                     }
+            }
+
+            // Error responses are retuned as thrown exceptions
+            if (response.IsErrorResponse)
+            {
+                switch (responseBody)
+                {
+                    case ObjectResponseBody objectResponseBody:
+                        writer.Append($"throw ErrorResponseExceptionFactory.Create<{value.Type}>(");
+                        writer.WriteReferenceOrConstant(value);
+                        writer.Line($", {responseVariable});");
+                        break;
+
+                    default:
+                        throw new InvalidOperationException("Error response must by of ObjectResponseBody type");
+                }
+                return;
             }
 
             switch (kind)

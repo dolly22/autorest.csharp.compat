@@ -513,9 +513,9 @@ namespace AutoRest.CSharp.Common.Input
                 intrinsicTypesToTreatEmptyStringAsNull,
                 ReadOption(root, Options.ShouldTreatBase64AsBinaryData),
                 methodsToKeepClientDefaultValue,
-                ReadOption(root, Configuration.Options.CompatClientFactory),
-                ReadOption(root, Configuration.Options.CompatClientInterfaces),
-                ReadOption(root, Configuration.Options.CompatErrorResponses),
+                ReadOption(root, Options.CompatClientFactory),
+                ReadOption(root, Options.CompatClientInterfaces),
+                ReadOption(root, Options.CompatErrorResponses),
                 MgmtConfiguration.LoadConfiguration(root),
                 MgmtTestConfiguration.LoadConfiguration(root),
                 ReadOption(root, Options.Branded),
@@ -572,9 +572,9 @@ namespace AutoRest.CSharp.Common.Input
             {
                 writer.WriteNonEmptyArray(Options.IntrinsicTypesToTreatEmptyStringAsNull, IntrinsicTypesToTreatEmptyStringAsNull.ToList());
             }
-            WriteIfNotDefault(writer, Configuration.Options.CompatClientFactory, Configuration.CompatClientFactory);
-            WriteIfNotDefault(writer, Configuration.Options.CompatClientInterfaces, Configuration.CompatClientInterfaces);
-            WriteIfNotDefault(writer, Configuration.Options.CompatErrorResponses, Configuration.CompatErrorResponses);
+            WriteIfNotDefault(writer, Options.CompatClientFactory, CompatClientFactory);
+            WriteIfNotDefault(writer, Options.CompatClientInterfaces, CompatClientInterfaces);
+            WriteIfNotDefault(writer, Options.CompatErrorResponses, CompatErrorResponses);
 
             MgmtConfiguration.SaveConfiguration(writer);
 

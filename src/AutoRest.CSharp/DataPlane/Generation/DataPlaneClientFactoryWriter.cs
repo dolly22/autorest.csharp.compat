@@ -2,22 +2,16 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using AutoRest.CSharp.Generation.Writers;
 using AutoRest.CSharp.Output.Models.Types;
 using AutoRest.CSharp.Output.Models;
 using AutoRest.CSharp.DataPlane.Output;
 using AutoRest.CSharp.Generation.Types;
-using System.Reflection;
-using AutoRest.CSharp.Input;
 using AutoRest.CSharp.Output.Models.Shared;
 using Azure.Core.Pipeline;
 using Azure.Core;
 using Azure;
 using AutoRest.CSharp.Common.Generation.Writers;
-using System.Linq;
-using Microsoft.CodeAnalysis;
 
 namespace AutoRest.CSharp.DataPlane.Generation
 {
@@ -65,7 +59,7 @@ namespace AutoRest.CSharp.DataPlane.Generation
             writer.Line($"private readonly {typeof(Uri)} {EndpointField};");
             writer.Line($"private readonly {clientOptions.Type} {OptionsField};");
             writer.Line($"private readonly {typeof(ClientDiagnostics)} {ClientDiagnosticsField.GetReferenceFormattable()};");
-            writer.Line($"private readonly {typeof(HttpPipeline)} {PipelineField};");
+            writer.Line($"private {typeof(HttpPipeline)} {PipelineField};");
         }
 
         private const string EndpointVariable = "endpoint";
@@ -87,80 +81,6 @@ namespace AutoRest.CSharp.DataPlane.Generation
             var clientOptionsName = library.ClientOptions!.Declaration.Name;
 
             var commonParams = new Parameter[] { KnownParameters.Endpoint with { DefaultValue = Constant.Default(new CSharpType(typeof(Uri), true)) } };
-
-            if (library.Authentication.ApiKey != null)
-            {
-                var ctorParams = RestClientBuilder.GetConstructorParameters(commonParams, typeof(AzureKeyCredential), false);
-
-                writer.WriteXmlDocumentationSummary($"Initializes a new instance of {client.Type.Name}");
-                foreach (Parameter parameter in ctorParams)
-                {
-                    writer.WriteXmlDocumentationParameter(parameter.Name, $"{parameter.Description}");
-                }
-                writer.WriteXmlDocumentationParameter(OptionsVariable, $"The options for configuring the client.");
-
-                writer.Append($"public {client.Type.Name:D}(");
-                foreach (Parameter parameter in ctorParams)
-                {
-                    writer.WriteParameter(parameter);
-                }
-                writer.Append($" {clientOptionsName} {OptionsVariable} = null)");
-
-                using (writer.Scope())
-                {
-                    writer.WriteParameterNullChecks(ctorParams);
-                    writer.Line();
-
-                    writer.Line($"{OptionsVariable} ??= new {clientOptionsName}();");
-                    writer.Line($"{ClientDiagnosticsField.GetReferenceFormattable()} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
-                    writer.Line($"{PipelineField} = {typeof(HttpPipelineBuilder)}.Build({OptionsVariable}, new {typeof(AzureKeyCredentialPolicy)}({CredentialVariable}, \"{library.Authentication.ApiKey.Name}\"));");
-                    writer.Line($"{EndpointField} = {EndpointVariable};");
-                    writer.Line($"{OptionsField} = {OptionsVariable};");
-                }
-                writer.Line();
-            }
-
-            if (library.Authentication.OAuth2 != null)
-            {
-                var ctorParams = RestClientBuilder.GetConstructorParameters(commonParams, typeof(TokenCredential), false);
-
-                writer.WriteXmlDocumentationSummary($"Initializes a new instance of {client.Type.Name}");
-                foreach (Parameter parameter in ctorParams)
-                {
-                    writer.WriteXmlDocumentationParameter(parameter.Name, $"{parameter.Description}");
-                }
-                writer.WriteXmlDocumentationParameter(OptionsVariable, $"The options for configuring the client.");
-
-                writer.Append($"public {client.Type.Name:D}(");
-                foreach (Parameter parameter in ctorParams)
-                {
-                    writer.WriteParameter(parameter);
-                }
-                writer.Append($" {clientOptionsName} {OptionsVariable} = null)");
-
-                using (writer.Scope())
-                {
-                    writer.WriteParameterNullChecks(ctorParams);
-                    writer.Line();
-
-                    writer.Line($"{OptionsVariable} ??= new {clientOptionsName}();");
-                    writer.Line($"{ClientDiagnosticsField.GetReferenceFormattable()} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
-                    var scopesParam = new CodeWriterDeclaration("scopes");
-                    writer.Append($"string[] {scopesParam:D} = ");
-                    writer.Append($"{{ ");
-                    foreach (var credentialScope in library.Authentication.OAuth2.Scopes)
-                    {
-                        writer.Append($"{credentialScope:L}, ");
-                    }
-                    writer.RemoveTrailingComma();
-                    writer.Line($"}};");
-
-                    writer.Line($"{PipelineField} = {typeof(HttpPipelineBuilder)}.Build({OptionsVariable}, new {typeof(BearerTokenAuthenticationPolicy)}({CredentialVariable}, {scopesParam}));");
-                    writer.Line($"{EndpointField} = {EndpointVariable};");
-                    writer.Line($"{OptionsField} = {OptionsVariable};");
-                }
-                writer.Line();
-            }
 
             {
                 var ctorParams = RestClientBuilder.GetConstructorParameters(commonParams, null);
