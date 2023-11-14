@@ -184,7 +184,8 @@ namespace AutoRest.CSharp.Common.Input
 
             return new OperationLongRunning(
                 FinalStateVia: operation.LongRunningFinalStateVia,
-                FinalResponse: CreateOperationResponse(operation.LongRunningFinalResponse)
+                FinalResponse: CreateOperationResponse(operation.LongRunningFinalResponse),
+                ResultPath: null
             );
         }
 
