@@ -31,10 +31,11 @@ namespace paging
         /// <param name="clientDiagnostics"> The handler for diagnostic messaging in the client. </param>
         /// <param name="pipeline"> The HTTP pipeline for sending and receiving REST requests and responses. </param>
         /// <param name="endpoint"> server parameter. </param>
-        /// <exception cref="ArgumentNullException"> <paramref name="clientDiagnostics"/> or <paramref name="pipeline"/> is null. </exception>
-        internal PagingClient(ClientDiagnostics clientDiagnostics, HttpPipeline pipeline, Uri endpoint = null)
+        /// <param name="apiVersion"> Api Version. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="clientDiagnostics"/>, <paramref name="pipeline"/> or <paramref name="apiVersion"/> is null. </exception>
+        internal PagingClient(ClientDiagnostics clientDiagnostics, HttpPipeline pipeline, Uri endpoint = null, string apiVersion = "1.0.0")
         {
-            RestClient = new PagingRestClient(clientDiagnostics, pipeline, endpoint);
+            RestClient = new PagingRestClient(clientDiagnostics, pipeline, endpoint, apiVersion);
             _clientDiagnostics = clientDiagnostics;
             _pipeline = pipeline;
         }
@@ -55,6 +56,24 @@ namespace paging
             HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetNoItemNamePagesRequest();
             HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetNoItemNamePagesNextPageRequest(nextLink);
             return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetNoItemNamePages", "value", "nextLink", cancellationToken);
+        }
+
+        /// <summary> A paging operation that gets an empty next link and should stop after page 1. </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual AsyncPageable<Product> GetEmptyNextLinkNamePagesAsync(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetEmptyNextLinkNamePagesRequest();
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetEmptyNextLinkNamePagesNextPageRequest(nextLink);
+            return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetEmptyNextLinkNamePages", "value", "nextLink", cancellationToken);
+        }
+
+        /// <summary> A paging operation that gets an empty next link and should stop after page 1. </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual Pageable<Product> GetEmptyNextLinkNamePages(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetEmptyNextLinkNamePagesRequest();
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetEmptyNextLinkNamePagesNextPageRequest(nextLink);
+            return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetEmptyNextLinkNamePages", "value", "nextLink", cancellationToken);
         }
 
         /// <summary> A paging operation that must ignore any kind of nextLink, and stop after page 1. </summary>
@@ -91,6 +110,32 @@ namespace paging
             return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetSinglePages", "values", "nextLink", cancellationToken);
         }
 
+        /// <summary> A paging operation that finishes on the first call with body params without a nextlink. </summary>
+        /// <param name="parameters"> put {'name': 'body'} to pass the test. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="parameters"/> is null. </exception>
+        public virtual AsyncPageable<Product> GetSinglePagesWithBodyParamsAsync(BodyParam parameters, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNull(parameters, nameof(parameters));
+
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetSinglePagesWithBodyParamsRequest(parameters);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetSinglePagesWithBodyParamsNextPageRequest(nextLink, parameters);
+            return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetSinglePagesWithBodyParams", "values", "nextLink", cancellationToken);
+        }
+
+        /// <summary> A paging operation that finishes on the first call with body params without a nextlink. </summary>
+        /// <param name="parameters"> put {'name': 'body'} to pass the test. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="parameters"/> is null. </exception>
+        public virtual Pageable<Product> GetSinglePagesWithBodyParams(BodyParam parameters, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNull(parameters, nameof(parameters));
+
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetSinglePagesWithBodyParamsRequest(parameters);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetSinglePagesWithBodyParamsNextPageRequest(nextLink, parameters);
+            return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetSinglePagesWithBodyParams", "values", "nextLink", cancellationToken);
+        }
+
         /// <summary> A paging operation whose first response's items list is empty, but still returns a next link. Second (and final) call, will give you an items list of 1. </summary>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         public virtual AsyncPageable<Product> FirstResponseEmptyAsync(CancellationToken cancellationToken = default)
@@ -110,24 +155,22 @@ namespace paging
         }
 
         /// <summary> A paging operation that includes a nextLink that has 10 pages. </summary>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="pagingGetMultiplePagesOptions"> Parameter group. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public virtual AsyncPageable<Product> GetMultiplePagesAsync(string clientRequestId = null, PagingGetMultiplePagesOptions pagingGetMultiplePagesOptions = null, CancellationToken cancellationToken = default)
+        public virtual AsyncPageable<Product> GetMultiplePagesAsync(PagingGetMultiplePagesOptions pagingGetMultiplePagesOptions = null, CancellationToken cancellationToken = default)
         {
-            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesRequest(clientRequestId, pagingGetMultiplePagesOptions);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesNextPageRequest(nextLink, clientRequestId, pagingGetMultiplePagesOptions);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesRequest(pagingGetMultiplePagesOptions);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesNextPageRequest(nextLink, pagingGetMultiplePagesOptions);
             return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetMultiplePages", "values", "nextLink", cancellationToken);
         }
 
         /// <summary> A paging operation that includes a nextLink that has 10 pages. </summary>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="pagingGetMultiplePagesOptions"> Parameter group. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public virtual Pageable<Product> GetMultiplePages(string clientRequestId = null, PagingGetMultiplePagesOptions pagingGetMultiplePagesOptions = null, CancellationToken cancellationToken = default)
+        public virtual Pageable<Product> GetMultiplePages(PagingGetMultiplePagesOptions pagingGetMultiplePagesOptions = null, CancellationToken cancellationToken = default)
         {
-            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesRequest(clientRequestId, pagingGetMultiplePagesOptions);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesNextPageRequest(nextLink, clientRequestId, pagingGetMultiplePagesOptions);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesRequest(pagingGetMultiplePagesOptions);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesNextPageRequest(nextLink, pagingGetMultiplePagesOptions);
             return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetMultiplePages", "values", "nextLink", cancellationToken);
         }
 
@@ -171,6 +214,26 @@ namespace paging
             return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.DuplicateParams", "values", "nextLink", cancellationToken);
         }
 
+        /// <summary> Paging with max page size. We don't want to. </summary>
+        /// <param name="maxpagesize"> Max page size query param. Don't send. The default value is AutoRest.CSharp.Output.Models.Types.EnumTypeValue. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual AsyncPageable<Product> PageWithMaxPageSizeAsync(MaxPageSizeType? maxpagesize = null, CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreatePageWithMaxPageSizeRequest(maxpagesize);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreatePageWithMaxPageSizeNextPageRequest(nextLink, maxpagesize);
+            return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.PageWithMaxPageSize", "values", "nextLink", cancellationToken);
+        }
+
+        /// <summary> Paging with max page size. We don't want to. </summary>
+        /// <param name="maxpagesize"> Max page size query param. Don't send. The default value is AutoRest.CSharp.Output.Models.Types.EnumTypeValue. </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual Pageable<Product> PageWithMaxPageSize(MaxPageSizeType? maxpagesize = null, CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreatePageWithMaxPageSizeRequest(maxpagesize);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreatePageWithMaxPageSizeNextPageRequest(nextLink, maxpagesize);
+            return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.PageWithMaxPageSize", "values", "nextLink", cancellationToken);
+        }
+
         /// <summary> Next operation for getWithQueryParams. Pass in next=True to pass test. Returns a ProductResult. </summary>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         public virtual AsyncPageable<Product> NextOperationWithQueryParamsAsync(CancellationToken cancellationToken = default)
@@ -188,52 +251,48 @@ namespace paging
         }
 
         /// <summary> A paging operation that includes a nextLink in odata format that has 10 pages. </summary>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="pagingGetOdataMultiplePagesOptions"> Parameter group. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public virtual AsyncPageable<Product> GetOdataMultiplePagesAsync(string clientRequestId = null, PagingGetOdataMultiplePagesOptions pagingGetOdataMultiplePagesOptions = null, CancellationToken cancellationToken = default)
+        public virtual AsyncPageable<Product> GetOdataMultiplePagesAsync(PagingGetOdataMultiplePagesOptions pagingGetOdataMultiplePagesOptions = null, CancellationToken cancellationToken = default)
         {
-            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetOdataMultiplePagesRequest(clientRequestId, pagingGetOdataMultiplePagesOptions);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetOdataMultiplePagesNextPageRequest(nextLink, clientRequestId, pagingGetOdataMultiplePagesOptions);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetOdataMultiplePagesRequest(pagingGetOdataMultiplePagesOptions);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetOdataMultiplePagesNextPageRequest(nextLink, pagingGetOdataMultiplePagesOptions);
             return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetOdataMultiplePages", "values", "odata.nextLink", cancellationToken);
         }
 
         /// <summary> A paging operation that includes a nextLink in odata format that has 10 pages. </summary>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="pagingGetOdataMultiplePagesOptions"> Parameter group. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public virtual Pageable<Product> GetOdataMultiplePages(string clientRequestId = null, PagingGetOdataMultiplePagesOptions pagingGetOdataMultiplePagesOptions = null, CancellationToken cancellationToken = default)
+        public virtual Pageable<Product> GetOdataMultiplePages(PagingGetOdataMultiplePagesOptions pagingGetOdataMultiplePagesOptions = null, CancellationToken cancellationToken = default)
         {
-            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetOdataMultiplePagesRequest(clientRequestId, pagingGetOdataMultiplePagesOptions);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetOdataMultiplePagesNextPageRequest(nextLink, clientRequestId, pagingGetOdataMultiplePagesOptions);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetOdataMultiplePagesRequest(pagingGetOdataMultiplePagesOptions);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetOdataMultiplePagesNextPageRequest(nextLink, pagingGetOdataMultiplePagesOptions);
             return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetOdataMultiplePages", "values", "odata.nextLink", cancellationToken);
         }
 
         /// <summary> A paging operation that includes a nextLink that has 10 pages. </summary>
         /// <param name="pagingGetMultiplePagesWithOffsetOptions"> Parameter group. </param>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="pagingGetMultiplePagesWithOffsetOptions"/> is null. </exception>
-        public virtual AsyncPageable<Product> GetMultiplePagesWithOffsetAsync(PagingGetMultiplePagesWithOffsetOptions pagingGetMultiplePagesWithOffsetOptions, string clientRequestId = null, CancellationToken cancellationToken = default)
+        public virtual AsyncPageable<Product> GetMultiplePagesWithOffsetAsync(PagingGetMultiplePagesWithOffsetOptions pagingGetMultiplePagesWithOffsetOptions, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNull(pagingGetMultiplePagesWithOffsetOptions, nameof(pagingGetMultiplePagesWithOffsetOptions));
 
-            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesWithOffsetRequest(pagingGetMultiplePagesWithOffsetOptions, clientRequestId);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesWithOffsetNextPageRequest(nextLink, pagingGetMultiplePagesWithOffsetOptions, clientRequestId);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesWithOffsetRequest(pagingGetMultiplePagesWithOffsetOptions);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesWithOffsetNextPageRequest(nextLink, pagingGetMultiplePagesWithOffsetOptions);
             return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetMultiplePagesWithOffset", "values", "nextLink", cancellationToken);
         }
 
         /// <summary> A paging operation that includes a nextLink that has 10 pages. </summary>
         /// <param name="pagingGetMultiplePagesWithOffsetOptions"> Parameter group. </param>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="pagingGetMultiplePagesWithOffsetOptions"/> is null. </exception>
-        public virtual Pageable<Product> GetMultiplePagesWithOffset(PagingGetMultiplePagesWithOffsetOptions pagingGetMultiplePagesWithOffsetOptions, string clientRequestId = null, CancellationToken cancellationToken = default)
+        public virtual Pageable<Product> GetMultiplePagesWithOffset(PagingGetMultiplePagesWithOffsetOptions pagingGetMultiplePagesWithOffsetOptions, CancellationToken cancellationToken = default)
         {
             Argument.AssertNotNull(pagingGetMultiplePagesWithOffsetOptions, nameof(pagingGetMultiplePagesWithOffsetOptions));
 
-            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesWithOffsetRequest(pagingGetMultiplePagesWithOffsetOptions, clientRequestId);
-            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesWithOffsetNextPageRequest(nextLink, pagingGetMultiplePagesWithOffsetOptions, clientRequestId);
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateGetMultiplePagesWithOffsetRequest(pagingGetMultiplePagesWithOffsetOptions);
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateGetMultiplePagesWithOffsetNextPageRequest(nextLink, pagingGetMultiplePagesWithOffsetOptions);
             return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetMultiplePagesWithOffset", "values", "nextLink", cancellationToken);
         }
 
@@ -383,6 +442,42 @@ namespace paging
             return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.GetMultiplePagesFragmentWithGroupingNextLink", "values", "odata.nextLink", cancellationToken);
         }
 
+        /// <summary> A paging operation with api version. When calling the next link, you want to append your client's api version to the next link. </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual AsyncPageable<Product> AppendApiVersionAsync(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateAppendApiVersionRequest();
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateAppendApiVersionNextPageRequest(nextLink);
+            return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.AppendApiVersion", "values", "nextLink", cancellationToken);
+        }
+
+        /// <summary> A paging operation with api version. When calling the next link, you want to append your client's api version to the next link. </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual Pageable<Product> AppendApiVersion(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateAppendApiVersionRequest();
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateAppendApiVersionNextPageRequest(nextLink);
+            return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.AppendApiVersion", "values", "nextLink", cancellationToken);
+        }
+
+        /// <summary> A paging operation with api version. When calling the next link, you want to reformat it and override the returned api version with your client's api version. </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual AsyncPageable<Product> ReplaceApiVersionAsync(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateReplaceApiVersionRequest();
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateReplaceApiVersionNextPageRequest(nextLink);
+            return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.ReplaceApiVersion", "values", "nextLink", cancellationToken);
+        }
+
+        /// <summary> A paging operation with api version. When calling the next link, you want to reformat it and override the returned api version with your client's api version. </summary>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        public virtual Pageable<Product> ReplaceApiVersion(CancellationToken cancellationToken = default)
+        {
+            HttpMessage FirstPageRequest(int? pageSizeHint) => RestClient.CreateReplaceApiVersionRequest();
+            HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => RestClient.CreateReplaceApiVersionNextPageRequest(nextLink);
+            return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, Product.DeserializeProduct, _clientDiagnostics, _pipeline, "PagingClient.ReplaceApiVersion", "values", "nextLink", cancellationToken);
+        }
+
         /// <summary> A paging operation that doesn't return a full URL, just a fragment. </summary>
         /// <param name="apiVersion"> Sets the api version to use. </param>
         /// <param name="tenant"> Sets the tenant to use. </param>
@@ -466,17 +561,16 @@ namespace paging
         }
 
         /// <summary> A long-running paging operation that includes a nextLink that has 10 pages. </summary>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="pagingGetMultiplePagesLroOptions"> Parameter group. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public virtual async Task<PagingGetMultiplePagesLROOperation> StartGetMultiplePagesLROAsync(string clientRequestId = null, PagingGetMultiplePagesLroOptions pagingGetMultiplePagesLroOptions = null, CancellationToken cancellationToken = default)
+        public virtual async Task<PagingGetMultiplePagesLROOperation> StartGetMultiplePagesLROAsync(PagingGetMultiplePagesLroOptions pagingGetMultiplePagesLroOptions = null, CancellationToken cancellationToken = default)
         {
             using var scope = _clientDiagnostics.CreateScope("PagingClient.StartGetMultiplePagesLRO");
             scope.Start();
             try
             {
-                var originalResponse = await RestClient.GetMultiplePagesLROAsync(clientRequestId, pagingGetMultiplePagesLroOptions, cancellationToken).ConfigureAwait(false);
-                return new PagingGetMultiplePagesLROOperation(_clientDiagnostics, _pipeline, RestClient.CreateGetMultiplePagesLRORequest(clientRequestId, pagingGetMultiplePagesLroOptions).Request, originalResponse, (_, nextLink) => RestClient.CreateGetMultiplePagesLRONextPageRequest(nextLink, clientRequestId, pagingGetMultiplePagesLroOptions));
+                var originalResponse = await RestClient.GetMultiplePagesLROAsync(pagingGetMultiplePagesLroOptions, cancellationToken).ConfigureAwait(false);
+                return new PagingGetMultiplePagesLROOperation(_clientDiagnostics, _pipeline, RestClient.CreateGetMultiplePagesLRORequest(pagingGetMultiplePagesLroOptions).Request, originalResponse, (_, nextLink) => RestClient.CreateGetMultiplePagesLRONextPageRequest(nextLink, pagingGetMultiplePagesLroOptions));
             }
             catch (Exception e)
             {
@@ -486,17 +580,16 @@ namespace paging
         }
 
         /// <summary> A long-running paging operation that includes a nextLink that has 10 pages. </summary>
-        /// <param name="clientRequestId"> The String to use. </param>
         /// <param name="pagingGetMultiplePagesLroOptions"> Parameter group. </param>
         /// <param name="cancellationToken"> The cancellation token to use. </param>
-        public virtual PagingGetMultiplePagesLROOperation StartGetMultiplePagesLRO(string clientRequestId = null, PagingGetMultiplePagesLroOptions pagingGetMultiplePagesLroOptions = null, CancellationToken cancellationToken = default)
+        public virtual PagingGetMultiplePagesLROOperation StartGetMultiplePagesLRO(PagingGetMultiplePagesLroOptions pagingGetMultiplePagesLroOptions = null, CancellationToken cancellationToken = default)
         {
             using var scope = _clientDiagnostics.CreateScope("PagingClient.StartGetMultiplePagesLRO");
             scope.Start();
             try
             {
-                var originalResponse = RestClient.GetMultiplePagesLRO(clientRequestId, pagingGetMultiplePagesLroOptions, cancellationToken);
-                return new PagingGetMultiplePagesLROOperation(_clientDiagnostics, _pipeline, RestClient.CreateGetMultiplePagesLRORequest(clientRequestId, pagingGetMultiplePagesLroOptions).Request, originalResponse, (_, nextLink) => RestClient.CreateGetMultiplePagesLRONextPageRequest(nextLink, clientRequestId, pagingGetMultiplePagesLroOptions));
+                var originalResponse = RestClient.GetMultiplePagesLRO(pagingGetMultiplePagesLroOptions, cancellationToken);
+                return new PagingGetMultiplePagesLROOperation(_clientDiagnostics, _pipeline, RestClient.CreateGetMultiplePagesLRORequest(pagingGetMultiplePagesLroOptions).Request, originalResponse, (_, nextLink) => RestClient.CreateGetMultiplePagesLRONextPageRequest(nextLink, pagingGetMultiplePagesLroOptions));
             }
             catch (Exception e)
             {
