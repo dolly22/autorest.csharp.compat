@@ -77,6 +77,7 @@ namespace AutoRest.TestServer.Tests.Mgmt.Unit
                 modelsToTreatEmptyStringAsNull: Array.Empty<string>(),
                 additionalIntrinsicTypesToTreatEmptyStringAsNull: Array.Empty<string>(),
                 shouldTreatBase64AsBinaryData: true,
+                methodsToKeepClientDefaultValue: Array.Empty<string>(),
                 compatClientFactory: false,
                 compatClientInterfaces: false,
                 compatErrorResponses: false,

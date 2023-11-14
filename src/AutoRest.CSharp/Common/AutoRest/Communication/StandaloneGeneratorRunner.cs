@@ -92,6 +92,10 @@ namespace AutoRest.CSharp.AutoRest.Communication
         private static void DeleteDirectory(string path, string[] keepFiles)
         {
             var directoryInfo = new DirectoryInfo(path);
+            if (!directoryInfo.Exists)
+            {
+                return;
+            }
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
                 if (keepFiles.Contains(file.Name))
@@ -256,6 +260,8 @@ namespace AutoRest.CSharp.AutoRest.Communication
             var intrinsicTypesToTreatEmptyStringAsNull = Configuration.DeserializeArray(intrinsicTypesToTreatEmptyStringAsNullElement);
             root.TryGetProperty(nameof(Configuration.Options.ModelFactoryForHlc), out var oldModelFactoryEntriesElement);
             var oldModelFactoryEntries = Configuration.DeserializeArray(oldModelFactoryEntriesElement);
+            root.TryGetProperty(nameof(Configuration.Options.MethodsToKeepClientDefaultValue), out var methodsToKeepClientDefaultValueElement);
+            var methodsToKeepClientDefaultValue = Configuration.DeserializeArray(methodsToKeepClientDefaultValueElement);
 
             Configuration.Initialize(
                 Path.Combine(outputPath, root.GetProperty(nameof(Configuration.OutputFolder)).GetString()!),
@@ -284,6 +290,7 @@ namespace AutoRest.CSharp.AutoRest.Communication
                 modelsToTreatEmptyStringAsNull,
                 intrinsicTypesToTreatEmptyStringAsNull,
                 ReadOption(root, Configuration.Options.ShouldTreatBase64AsBinaryData),
+                methodsToKeepClientDefaultValue,
                 ReadOption(root, Configuration.Options.CompatClientFactory),
                 ReadOption(root, Configuration.Options.CompatClientInterfaces),
                 ReadOption(root, Configuration.Options.CompatErrorResponses),
