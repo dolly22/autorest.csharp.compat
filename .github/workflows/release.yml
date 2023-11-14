@@ -1,10 +1,15 @@
 # Create github release from pushed tag, publish package to npm
 
 name: Release from tag
-run-name: Release from tag ${{ github.ref_name }}
+run-name: Release from tag ${{ github.event.inputs.tag_name }}
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        type: string
+        description: Tag to create release from
+        required: true
 
 jobs:
   build:
@@ -15,21 +20,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
-    - uses: actions/setup-dotnet@v3
       with:
-        global-json-file: global.json
+        ref: refs/tags/${{ github.event.inputs.tag_name }}
 
     - name: Get version from tag
       id: parse-tag
       run: |
-        $gitRef="${{ github.ref }}"
-        if (-not $gitRef.StartsWith("refs/tags")) {
-          throw "Must be started from version tag ref!"
-        }
-        $officialBuildId="${{ github.ref_name }}".Split(".")[-2, -1] -Join "."
+        $officialBuildId="${{ github.event.inputs.tag_name }}".Split(".")[-2, -1] -Join "."
         "officialBuildId=$officialBuildId" >> $env:GITHUB_OUTPUT
       shell: pwsh
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        global-json-file: global.json
 
     - name: Build dotnet
       run: dotnet build -c Release -p:OfficialBuildId=${{ steps.parse-tag.outputs.officialBuildId }} src/AutoRest.CSharp/AutoRest.CSharp.csproj
@@ -41,7 +44,7 @@ jobs:
       id: version_npm
       working-directory: ./artifacts/bin/AutoRest.CSharp/Release/net6.0
       run: |
-        $packageVersion="${{ github.ref_name }}".TrimStart("v")
+        $packageVersion="${{ github.event.inputs.tag_name }}".TrimStart("v")
         npm version --no-git-tag-version $packageVersion
       shell: pwsh
 
@@ -96,6 +99,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         body_path: RELEASE_NOTES.md
+        tag_name: ${{ github.event.inputs.tag_name }}
         files: |
           *.tgz
 
