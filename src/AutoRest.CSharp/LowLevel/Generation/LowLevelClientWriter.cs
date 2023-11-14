@@ -310,6 +310,10 @@ namespace AutoRest.CSharp.Generation.Writers
                         _writer.Line($"return {typeof(Response)}.{nameof(Response.FromValue)}({responseVariable:I}.Content.ToObjectFromJson<{enumType.ValueType}>().To{declaredTypeName}(), {responseVariable:I});");
                     }
                 }
+                else if (responseType.IsFrameworkType && responseType.FrameworkType == typeof(BinaryData))
+                {
+                    _writer.Line($"return {typeof(Response)}.{nameof(Response.FromValue)}({responseVariable:I}.Content, {responseVariable:I});");
+                }
                 else if (responseType.IsFrameworkType)
                 {
                     _writer.Line($"return {typeof(Response)}.{nameof(Response.FromValue)}({responseVariable:I}.Content.ToObjectFromJson<{responseType}>(), {responseVariable:I});");
@@ -536,13 +540,8 @@ namespace AutoRest.CSharp.Generation.Writers
             WriteConvenienceMethodOmitReasonIfNecessary(clientMethod.ConvenienceMethodOmittingMessage);
 
             WriteMethodDocumentation(_writer, methodSignature, clientMethod, isAsync);
-            var docRef = GetMethodSignatureString(methodSignature);
-            _writer.Line($"/// <include file=\"Docs/{_client.Type.Name}.xml\" path=\"doc/members/member[@name='{docRef}']/*\" />");
 
-            _xmlDocWriter.AddMember(docRef);
-            _xmlDocWriter.AddExamples(
-                clientMethod.Samples.Where(s => !s.IsConvenienceSample).Select(s => (s.GetSampleInformation(isAsync), s.GetExampleMethodSignature(isAsync).Name))
-                );
+            WriteSampleRefsIfNecessary(methodSignature, clientMethod.Samples, isAsync);
         }
 
         private void WriteConvenienceMethodOmitReasonIfNecessary(ConvenienceMethodOmittingMessage? message)
@@ -560,12 +559,22 @@ namespace AutoRest.CSharp.Generation.Writers
 
             _writer.WriteMethodDocumentation(methodSignature);
             _writer.WriteXmlDocumentation("remarks", methodSignature.DescriptionText);
+
+            WriteSampleRefsIfNecessary(methodSignature, samples, isAsync);
+        }
+
+        private void WriteSampleRefsIfNecessary(MethodSignature methodSignature, IEnumerable<DpgOperationSample> samples, bool isAsync)
+        {
+            // do not write this part when there is no samples
+            if (!samples.Any())
+                return;
+
             var docRef = GetMethodSignatureString(methodSignature);
             _writer.Line($"/// <include file=\"Docs/{_client.Type.Name}.xml\" path=\"doc/members/member[@name='{docRef}']/*\" />");
 
             _xmlDocWriter.AddMember(docRef);
             _xmlDocWriter.AddExamples(
-                samples.Select(s => (s.GetSampleInformation(isAsync), s.GetExampleMethodSignature(isAsync).Name))
+                samples.Select(s => (s.GetSampleInformation(isAsync), s.GetMethodName(isAsync)))
                 );
         }
 
@@ -573,14 +582,11 @@ namespace AutoRest.CSharp.Generation.Writers
         {
             var builder = new StringBuilder(signature.Name);
             builder.Append("(");
-            var paramList = signature.Parameters.Select(p => p.Type.ConvertParamNameForDocs());
+            var paramList = signature.Parameters.Select(p => p.Type.ToStringForDocs());
             builder.Append(string.Join(",", paramList));
             builder.Append(")");
             return builder.ToString();
         }
-
-        private static string EscapeXmlCSharpType(CSharpType type)
-            => type.ToString().Trim().Replace('<', '{').Replace('>', '}');
 
         private static void WriteProtocolMethodDocumentation(CodeWriter writer, LowLevelClientMethod clientMethod, bool isAsync)
         {
@@ -605,12 +611,6 @@ namespace AutoRest.CSharp.Generation.Writers
             }
 
             return scope;
-        }
-
-        private static void WriteConvenienceMethodDocumentation(CodeWriter writer, MethodSignature convenienceMethod)
-        {
-            writer.WriteMethodDocumentation(convenienceMethod, convenienceMethod.SummaryText);
-            writer.WriteXmlDocumentation("remarks", convenienceMethod.DescriptionText);
         }
 
         private void WriteCancellationTokenToRequestContextMethod()

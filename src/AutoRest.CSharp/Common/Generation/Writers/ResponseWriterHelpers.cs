@@ -4,13 +4,13 @@
 using System;
 using System.IO;
 using System.Linq;
+using AutoRest.CSharp.Common.Output.Expressions.ValueExpressions;
 using AutoRest.CSharp.Output.Models;
 using AutoRest.CSharp.Output.Models.Requests;
 using AutoRest.CSharp.Output.Models.Responses;
 using AutoRest.CSharp.Output.Models.Shared;
 using Azure;
 using Azure.Core;
-using Azure.Core.Pipeline;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AutoRest.CSharp.Generation.Writers
@@ -66,7 +66,7 @@ namespace AutoRest.CSharp.Generation.Writers
             {
                 case ObjectResponseBody objectResponseBody:
                     writer.Line($"{responseBody.Type} {valueVariable:D} = default;");
-                    writer.WriteDeserializationForMethods(objectResponseBody.Serialization, async, valueVariable, responseVariable, objectResponseBody.Type);
+                    writer.WriteDeserializationForMethods(objectResponseBody.Serialization, async, new VariableReference(responseBody.Type, valueVariable), responseVariable, objectResponseBody.Type);
                     value = new Reference(valueVariable.ActualName, responseBody.Type);
                     break;
                 case StreamResponseBody _:
