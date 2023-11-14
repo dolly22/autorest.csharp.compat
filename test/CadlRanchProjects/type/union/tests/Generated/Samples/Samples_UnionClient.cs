@@ -13,6 +13,7 @@ using Azure.Core;
 using Azure.Identity;
 using NUnit.Framework;
 using _Type.Union;
+using _Type.Union.Models;
 
 namespace _Type.Union.Samples
 {
@@ -24,7 +25,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -39,7 +40,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -50,11 +51,31 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_SendInt_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = client.SendInt(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendInt_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = await client.SendIntAsync(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_SendInt_AllParameters()
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -69,7 +90,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -80,11 +101,31 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_SendInt_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = client.SendInt(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendInt_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = await client.SendIntAsync(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_SendIntArray_ShortVersion()
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -99,7 +140,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -110,11 +151,31 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_SendIntArray_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = client.SendIntArray(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendIntArray_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = await client.SendIntArrayAsync(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_SendIntArray_AllParameters()
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -129,7 +190,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 simpleUnion = 1234,
             });
@@ -140,11 +201,31 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_SendIntArray_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = client.SendIntArray(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendIntArray_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithSimpleUnionProperty input = new ModelWithSimpleUnionProperty(BinaryData.FromObjectAsJson(1234));
+            Response response = await client.SendIntArrayAsync(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_SendFirstNamedUnionValue_ShortVersion()
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -163,7 +244,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -178,11 +259,39 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_SendFirstNamedUnionValue_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = client.SendFirstNamedUnionValue(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendFirstNamedUnionValue_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = await client.SendFirstNamedUnionValueAsync(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_SendFirstNamedUnionValue_AllParameters()
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -201,7 +310,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -216,11 +325,39 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_SendFirstNamedUnionValue_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = client.SendFirstNamedUnionValue(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendFirstNamedUnionValue_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = await client.SendFirstNamedUnionValueAsync(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_SendSecondNamedUnionValue_ShortVersion()
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -239,7 +376,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -254,11 +391,39 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_SendSecondNamedUnionValue_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = client.SendSecondNamedUnionValue(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendSecondNamedUnionValue_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = await client.SendSecondNamedUnionValueAsync(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_SendSecondNamedUnionValue_AllParameters()
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -277,7 +442,7 @@ namespace _Type.Union.Samples
         {
             UnionClient client = new UnionClient();
 
-            RequestContent content = RequestContent.Create(new
+            using RequestContent content = RequestContent.Create(new
             {
                 namedUnion = new
                 {
@@ -288,6 +453,34 @@ namespace _Type.Union.Samples
             Response response = await client.SendSecondNamedUnionValueAsync(content);
 
             Console.WriteLine(response.Status);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public void Example_SendSecondNamedUnionValue_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = client.SendSecondNamedUnionValue(input);
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_SendSecondNamedUnionValue_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            ModelWithNamedUnionProperty input = new ModelWithNamedUnionProperty(BinaryData.FromObjectAsJson(new
+            {
+                prop1 = 1234,
+                name = "<name>",
+            }));
+            Response response = await client.SendSecondNamedUnionValueAsync(input);
         }
 
         [Test]
@@ -316,6 +509,24 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveString_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = client.ReceiveString();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveString_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = await client.ReceiveStringAsync();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_ReceiveString_AllParameters()
         {
             UnionClient client = new UnionClient();
@@ -336,6 +547,24 @@ namespace _Type.Union.Samples
 
             JsonElement result = JsonDocument.Parse(response.ContentStream).RootElement;
             Console.WriteLine(result.GetProperty("simpleUnion").ToString());
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveString_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = client.ReceiveString();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveString_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = await client.ReceiveStringAsync();
         }
 
         [Test]
@@ -364,6 +593,24 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveIntArray_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = client.ReceiveIntArray();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveIntArray_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = await client.ReceiveIntArrayAsync();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_ReceiveIntArray_AllParameters()
         {
             UnionClient client = new UnionClient();
@@ -384,6 +631,24 @@ namespace _Type.Union.Samples
 
             JsonElement result = JsonDocument.Parse(response.ContentStream).RootElement;
             Console.WriteLine(result.GetProperty("simpleUnion").ToString());
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveIntArray_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = client.ReceiveIntArray();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveIntArray_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithSimpleUnionPropertyInResponse> response = await client.ReceiveIntArrayAsync();
         }
 
         [Test]
@@ -412,6 +677,24 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveFirstNamedUnionValue_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = client.ReceiveFirstNamedUnionValue();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveFirstNamedUnionValue_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = await client.ReceiveFirstNamedUnionValueAsync();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_ReceiveFirstNamedUnionValue_AllParameters()
         {
             UnionClient client = new UnionClient();
@@ -432,6 +715,24 @@ namespace _Type.Union.Samples
 
             JsonElement result = JsonDocument.Parse(response.ContentStream).RootElement;
             Console.WriteLine(result.GetProperty("namedUnion").ToString());
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveFirstNamedUnionValue_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = client.ReceiveFirstNamedUnionValue();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveFirstNamedUnionValue_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = await client.ReceiveFirstNamedUnionValueAsync();
         }
 
         [Test]
@@ -460,6 +761,24 @@ namespace _Type.Union.Samples
 
         [Test]
         [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveSecondNamedUnionValue_ShortVersion_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = client.ReceiveSecondNamedUnionValue();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveSecondNamedUnionValue_ShortVersion_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = await client.ReceiveSecondNamedUnionValueAsync();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
         public void Example_ReceiveSecondNamedUnionValue_AllParameters()
         {
             UnionClient client = new UnionClient();
@@ -480,6 +799,24 @@ namespace _Type.Union.Samples
 
             JsonElement result = JsonDocument.Parse(response.ContentStream).RootElement;
             Console.WriteLine(result.GetProperty("namedUnion").ToString());
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public void Example_ReceiveSecondNamedUnionValue_AllParameters_Convenience()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = client.ReceiveSecondNamedUnionValue();
+        }
+
+        [Test]
+        [Ignore("Only validating compilation of examples")]
+        public async Task Example_ReceiveSecondNamedUnionValue_AllParameters_Convenience_Async()
+        {
+            UnionClient client = new UnionClient();
+
+            Response<ModelWithNamedUnionPropertyInResponse> response = await client.ReceiveSecondNamedUnionValueAsync();
         }
     }
 }

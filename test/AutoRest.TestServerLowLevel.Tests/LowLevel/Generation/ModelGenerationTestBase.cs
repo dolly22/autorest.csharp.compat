@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Generation.Types;
-using AutoRest.CSharp.Input;
 using AutoRest.CSharp.Output.Models.Types;
 using NUnit.Framework;
 
@@ -69,7 +68,9 @@ namespace AutoRest.CSharp.Generation.Writers.Tests
                 compatClientInterfaces: false,
                 compatErrorResponses: false,
                 mgmtConfiguration: null,
-                mgmtTestConfiguration: null);
+                mgmtTestConfiguration: null,
+                branded: true,
+                generateTestProject: true);
         }
 
 

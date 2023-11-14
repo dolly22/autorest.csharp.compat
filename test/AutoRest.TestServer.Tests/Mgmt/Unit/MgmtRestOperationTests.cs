@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Input;
 using AutoRest.CSharp.Mgmt.Models;
 using NUnit.Framework;
@@ -85,7 +86,9 @@ namespace AutoRest.TestServer.Tests.Mgmt.Unit
                 compatClientInterfaces: false,
                 compatErrorResponses: false,
                 mgmtConfiguration: mgmtConfiguration,
-                mgmtTestConfiguration: null);
+                mgmtTestConfiguration: null,
+                branded: true,
+                generateTestProject: true);
         }
 
         private void TestPair(ResourceMatchType expected, HttpMethod httpMethod, string resourcePathStr, string requestPathStr, bool isList)

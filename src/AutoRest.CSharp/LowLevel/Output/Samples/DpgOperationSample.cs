@@ -5,22 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Common.Input.Examples;
 using AutoRest.CSharp.Common.Output.Expressions.Statements;
 using AutoRest.CSharp.Common.Output.Expressions.ValueExpressions;
 using AutoRest.CSharp.Common.Output.Models;
-using AutoRest.CSharp.Generation.Types;
 using AutoRest.CSharp.LowLevel.Extensions;
 using AutoRest.CSharp.Output.Models;
 using AutoRest.CSharp.Output.Models.Shared;
 using AutoRest.CSharp.Output.Models.Types;
 using AutoRest.CSharp.Utilities;
 using Azure;
-using NUnit.Framework;
 using static AutoRest.CSharp.Common.Output.Models.Snippets;
 
 namespace AutoRest.CSharp.Output.Samples.Models
@@ -41,7 +37,7 @@ namespace AutoRest.CSharp.Output.Samples.Models
 
         protected internal readonly IEnumerable<InputParameterExample> _inputClientParameterExamples;
         protected internal readonly InputOperationExample _inputOperationExample;
-        private readonly LowLevelClient _client;
+        protected internal readonly LowLevelClient _client;
         protected internal readonly LowLevelClientMethod _method;
         private readonly MethodSignature _operationMethodSignature;
         public bool IsAllParametersUsed { get; }
@@ -109,28 +105,11 @@ namespace AutoRest.CSharp.Output.Samples.Models
                 {
                     // when it is not inline parameter, we add the declaration of the parameter into the statements, and returns the parameter name reference
                     var parameterReference = new VariableReference(parameter.Type, parameter.Name);
-                    var declaration = Snippets.Declare(parameterReference, parameterExpression);
+                    var declaration = NeedsDispose(parameter) ? UsingDeclare(parameterReference, parameterExpression) : Declare(parameterReference, parameterExpression);
                     variableDeclarationStatements.Add(declaration);
                     yield return parameter.IsOptionalInSignature ? new PositionalParameterReference(parameter.Name, parameterReference) : parameterReference; // returns the parameter name reference
                 }
             }
-        }
-
-        public string GetMethodName(bool isAsync)
-        {
-            var builder = new StringBuilder("Example_").Append(_operationMethodSignature.Name);
-
-            builder.Append("_").Append(ExampleKey);
-
-            if (IsConvenienceSample)
-            {
-                builder.Append("_Convenience");
-            }
-            if (isAsync)
-            {
-                builder.Append("_Async");
-            }
-            return builder.ToString();
         }
 
         private Dictionary<string, InputExampleParameterValue>? _parameterValueMapping;
@@ -249,7 +228,7 @@ namespace AutoRest.CSharp.Output.Samples.Models
             // handle credentials
             if (parameter.Type.EqualsIgnoreNullable(KnownParameters.KeyAuth.Type))
             {
-                result.Add(parameter.Name, new InputExampleParameterValue(parameter, New.Instance(typeof(AzureKeyCredential), Literal("<key>"))));
+                result.Add(parameter.Name, new InputExampleParameterValue(parameter, New.Instance(Configuration.ApiTypes.KeyCredentialType, Configuration.ApiTypes.GetKeySampleExpression(_client.TopLevelClient.Type.Name))));
                 return true;
             }
 
@@ -310,6 +289,14 @@ namespace AutoRest.CSharp.Output.Samples.Models
 
             // sometimes, especially in swagger projects, the parameter used as endpoint in our client, does not have the `IsEndpoint` flag, we have to fallback here so that we could at least have a value for it.
             return InputExampleValue.Value(InputPrimitiveType.String, $"<{parameterName}>");
+        }
+
+        private bool NeedsDispose(Parameter parameter)
+        {
+            if (IsSameParameter(parameter, KnownParameters.RequestContent) || IsSameParameter(parameter, KnownParameters.RequestContentNullable))
+                return true;
+
+            return false;
         }
 
         private bool IsInlineParameter(Parameter parameter)

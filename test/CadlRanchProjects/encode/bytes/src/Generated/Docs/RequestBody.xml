@@ -37,31 +37,19 @@ This sample shows how to call DefaultAsync.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.DefaultAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call DefaultAsync.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.DefaultAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call DefaultAsync with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.DefaultAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call DefaultAsync with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.DefaultAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="Default(RequestContent,RequestContext)">
@@ -70,31 +58,19 @@ This sample shows how to call Default.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.Default(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Default.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.Default(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call Default with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.Default(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Default with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.Default(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="OctetStreamAsync(BinaryData,CancellationToken)">
@@ -133,31 +109,19 @@ This sample shows how to call OctetStreamAsync.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.OctetStreamAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call OctetStreamAsync.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.OctetStreamAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call OctetStreamAsync with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.OctetStreamAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call OctetStreamAsync with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.OctetStreamAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="OctetStream(RequestContent,RequestContext)">
@@ -166,31 +130,19 @@ This sample shows how to call OctetStream.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.OctetStream(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call OctetStream.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.OctetStream(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call OctetStream with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.OctetStream(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call OctetStream with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.OctetStream(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="CustomContentTypeAsync(BinaryData,CancellationToken)">
@@ -229,31 +181,19 @@ This sample shows how to call CustomContentTypeAsync.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.CustomContentTypeAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call CustomContentTypeAsync.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.CustomContentTypeAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call CustomContentTypeAsync with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.CustomContentTypeAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call CustomContentTypeAsync with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.CustomContentTypeAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="CustomContentType(RequestContent,RequestContext)">
@@ -262,31 +202,19 @@ This sample shows how to call CustomContentType.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.CustomContentType(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call CustomContentType.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.CustomContentType(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call CustomContentType with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.CustomContentType(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call CustomContentType with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.CustomContentType(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="Base64Async(BinaryData,CancellationToken)">
@@ -325,31 +253,19 @@ This sample shows how to call Base64Async.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.Base64Async(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64Async.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.Base64Async(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call Base64Async with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.Base64Async(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64Async with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.Base64Async(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="Base64(RequestContent,RequestContext)">
@@ -358,31 +274,19 @@ This sample shows how to call Base64.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.Base64(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.Base64(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call Base64 with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.Base64(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64 with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.Base64(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="Base64urlAsync(BinaryData,CancellationToken)">
@@ -421,31 +325,19 @@ This sample shows how to call Base64urlAsync.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.Base64urlAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64urlAsync.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.Base64urlAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call Base64urlAsync with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = await client.Base64urlAsync(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64urlAsync with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = await client.Base64urlAsync(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
     <member name="Base64url(RequestContent,RequestContext)">
@@ -454,31 +346,19 @@ This sample shows how to call Base64url.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.Base64url(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64url.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.Base64url(BinaryData.FromObjectAsJson(new object()));
 ]]></code>
 This sample shows how to call Base64url with all request content.
 <code><![CDATA[
 RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
 
-RequestContent content = RequestContent.Create(new object());
+using RequestContent content = RequestContent.Create(new object());
 Response response = client.Base64url(content);
 
 Console.WriteLine(response.Status);
-]]></code>
-This sample shows how to call Base64url with all parameters.
-<code><![CDATA[
-RequestBody client = new BytesClient().GetRequestBodyClient(apiVersion: "1.0.0");
-
-Response response = client.Base64url(BinaryData.FromObjectAsJson(new object()));
 ]]></code></example>
     </member>
   </members>

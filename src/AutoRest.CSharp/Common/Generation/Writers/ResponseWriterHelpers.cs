@@ -4,12 +4,12 @@
 using System;
 using System.IO;
 using System.Linq;
+using AutoRest.CSharp.Common.Input;
 using AutoRest.CSharp.Common.Output.Expressions.ValueExpressions;
 using AutoRest.CSharp.Output.Models;
 using AutoRest.CSharp.Output.Models.Requests;
 using AutoRest.CSharp.Output.Models.Responses;
 using AutoRest.CSharp.Output.Models.Shared;
-using Azure;
 using Azure.Core;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -123,7 +123,7 @@ namespace AutoRest.CSharp.Generation.Writers
                     writer.Append($", headers, {responseVariable});");
                     break;
                 case ReturnKind.Value:
-                    writer.Append($"return {typeof(Azure.Response)}.FromValue");
+                    writer.Append($"return {Configuration.ApiTypes.ResponseType}.FromValue");
                     if (!Equals(responseBody?.Type, operation.ReturnType))
                     {
                         writer.Append($"<{operation.ReturnType}>");
@@ -192,7 +192,7 @@ namespace AutoRest.CSharp.Generation.Writers
 
                 writer
                     .Line($"default:")
-                    .Line($"throw new {typeof(RequestFailedException)}({responseVariable});");
+                    .Line($"throw new {Configuration.ApiTypes.RequestFailedExceptionType}({responseVariable});");
             }
         }
 
