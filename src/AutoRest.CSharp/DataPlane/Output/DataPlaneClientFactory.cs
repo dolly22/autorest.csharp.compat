@@ -21,7 +21,7 @@ namespace AutoRest.CSharp.DataPlane.Output
         {
             _context = context;
             DefaultName = clientPrefix + clientSuffix;
-            ClientInterface = new DataPlaneClientFactoryInterface($"I{clientPrefix}{clientSuffix}", context);
+            ClientInterface = new DataPlaneClientFactoryInterface($"I{clientPrefix}", context);
         }
 
         public DataPlaneClientFactoryInterface ClientInterface { get; }

@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+-   Synced with upstream branch `feature/v3`
+-   Add universal `compat-client-factory` constructor with per retry policy support
+
 ## [3.0.0-beta.20231114.1] - 2023-11-14
 
 -   Synced with origin branch `feature/v3`

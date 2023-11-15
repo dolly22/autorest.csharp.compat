@@ -62,12 +62,11 @@ namespace AutoRest.CSharp.DataPlane.Generation
             writer.Line($"private {typeof(HttpPipeline)} {PipelineField};");
         }
 
+        private const string PoliciesVariable = "perRetryPolicies";
         private const string EndpointVariable = "endpoint";
         private const string EndpointField = "_" + EndpointVariable;
-        private const string CredentialVariable = "credential";
         private const string OptionsVariable = "options";
         private const string OptionsField = "_" + OptionsVariable;
-
 
         private void WriteFactoryCtors(CodeWriter writer, DataPlaneClientFactory client, DataPlaneOutputLibrary library)
         {
@@ -91,13 +90,15 @@ namespace AutoRest.CSharp.DataPlane.Generation
                     writer.WriteXmlDocumentationParameter(parameter.Name, $"{parameter.Description}");
                 }
                 writer.WriteXmlDocumentationParameter(OptionsVariable, $"The options for configuring the client.");
+                writer.WriteXmlDocumentationParameter(PoliciesVariable, $"Per retry pipeline policies.");
 
                 writer.Append($"public {client.Type.Name:D}(");
                 foreach (Parameter parameter in ctorParams)
                 {
                     writer.WriteParameter(parameter);
                 }
-                writer.Append($" {clientOptionsName} {OptionsVariable} = null)");
+                writer.Append($" {clientOptionsName} {OptionsVariable} = null,");
+                writer.Append($" params {typeof(HttpPipelinePolicy[])} {PoliciesVariable})");
 
                 using (writer.Scope())
                 {
@@ -107,7 +108,7 @@ namespace AutoRest.CSharp.DataPlane.Generation
                     writer.Line($"{OptionsVariable} ??= new {clientOptionsName}();");
                     writer.Line($"{ClientDiagnosticsField.GetReferenceFormattable()} = new {typeof(ClientDiagnostics)}({OptionsVariable});");
 
-                    writer.Line($"{PipelineField} = {typeof(HttpPipelineBuilder)}.Build({OptionsVariable});");
+                    writer.Line($"{PipelineField} = {typeof(HttpPipelineBuilder)}.Build({OptionsVariable}, {PoliciesVariable});");
                     writer.Line($"{EndpointField} = {EndpointVariable};");
                     writer.Line($"{OptionsField} = {OptionsVariable};");
                 }
